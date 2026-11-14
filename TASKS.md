@@ -52,14 +52,14 @@ phase, commit after each phase. See `CLAUDE.md`.
 - [x] Gates pass → commit
 
 ## Phase 5 — YouTube adapter
-- [ ] `youtube-main-world.ts` fetch + XHR interceptor for `/api/timedtext` → postMessage
-- [ ] Isolated-side listener with origin/source checks; parse + merge; translate; render
-- [ ] Try to enable English captions via `#movie_player` API (MAIN world, try/catch);
+- [x] `youtube-main-world.ts` fetch + XHR interceptor for `/api/timedtext` → postMessage
+- [x] Isolated-side listener with origin/source checks; parse + merge; translate; render
+- [x] Try to enable English captions via `#movie_player` API (MAIN world, try/catch);
       prefer manual over ASR
-- [ ] DOM fallback mode (`.ytp-caption-segment`, 350 ms debounce)
-- [ ] SPA navigation reset (`yt-navigate-finish`, `popstate`), ad handling (`ad-showing`)
-- [ ] `hideOriginal` style injection
-- [ ] Gates pass → commit
+- [x] DOM fallback mode (`.ytp-caption-segment`, 350 ms debounce)
+- [x] SPA navigation reset (`yt-navigate-finish`, `popstate`), ad handling (`ad-showing`)
+- [x] `hideOriginal` style injection
+- [x] Gates pass → commit
 
 ## Phase 6 — Popup, i18n, shortcut
 - [ ] `_locales/en/messages.json`, `_locales/tr/messages.json` (all UI + status strings,

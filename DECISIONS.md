@@ -37,3 +37,10 @@ Decisions taken during development (append below, one line each: decision — re
 - HTML5 `videoKey` = `h5:` + FNV-1a hash of origin+path+currentSrc+track language/label (short, stable storage key).
 - YouTube embeds in third-party iframes (`youtube.com/embed`) are not handled: the MAIN-world interceptor only runs in the top frame, and the HTML5 adapter never runs on youtube.com.
 - Test page video has no `crossorigin` attribute (the MDN host might not send CORS headers); the VTT is same-origin so cues are readable anyway.
+- YouTube caption race: the MAIN-world script (document_start) buffers the last json3 payloads for up to 3 videos; the isolated adapter (document_idle) posts `YT_READY` on each video to get them replayed.
+- MAIN world ignores timedtext responses that are not json3 (no `"events"`) and auto-translated tracks (`tlang` set). XHR bodies are read only for responseType `''`/`text`/`json`/`arraybuffer`; everything is wrapped in try/catch and the original response is untouched (fetch uses `res.clone()`).
+- Payload ranking on the isolated side: manual EN < ASR EN < other-language manual < other-language ASR; a better-ranked payload replaces the current cue list. Non-English tracks are still translated (sl=auto) if nothing English exists.
+- `YT_ENABLE_CC` is posted 1.5 s after a video starts if no captions arrived yet or the active track is ASR (to upgrade to manual English). The MAIN world calls `loadModule('captions')`, reads `getOption('captions','tracklist')` (retrying up to 5 s) and `setOption('captions','track', best)`; result is reported back with `YT_CC_RESULT`.
+- Status becomes `no-subtitles` (hint "Turn on CC (English)") when enabling CC failed or nothing arrived within 8 s.
+- `videoKey` for YouTube = `yt:<videoId>:<lang>` plus `:asr` for auto-generated tracks.
+- DOM fallback clears the overlay immediately when the native caption disappears and only debounces (350 ms) new text.
