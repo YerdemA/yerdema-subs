@@ -83,5 +83,5 @@ phase, commit after each phase. See `CLAUDE.md`.
 - [ ] "Copy current subtitle" button
 
 ## Final report
-- [ ] Write `REPORT.md` (Turkish): what was built, what works, known limitations, what to test
+- [x] Write `REPORT.md` (Turkish): what was built, what works, known limitations, what to test
       manually first, any blocked items.
