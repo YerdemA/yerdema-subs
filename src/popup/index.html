@@ -2,11 +2,77 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=320" />
     <title>Yerdema Subs</title>
     <link rel="stylesheet" href="./popup.css" />
   </head>
   <body>
-    <div id="app"></div>
+    <header class="header">
+      <img class="logo" src="../icons/icon32.png" width="24" height="24" alt="" />
+      <div class="title">
+        <span class="name">Yerdema Subs</span>
+        <span class="version" id="version"></span>
+      </div>
+      <label class="switch" data-i18n-title="toggleLabel">
+        <input type="checkbox" id="enabled" role="switch" data-i18n-aria="toggleLabel" />
+        <span class="slider" aria-hidden="true"></span>
+      </label>
+    </header>
+
+    <section class="status" id="status" data-state="idle" aria-live="polite">
+      <span class="dot" aria-hidden="true"></span>
+      <div class="status-text">
+        <div class="status-main" id="status-main">…</div>
+        <div class="status-detail" id="status-detail" hidden></div>
+        <div class="status-source" id="status-source" hidden></div>
+      </div>
+    </section>
+
+    <section class="controls" id="controls">
+      <div class="row">
+        <span class="label" data-i18n="labelMode">Display</span>
+        <div class="segmented" role="radiogroup" data-i18n-aria="labelMode">
+          <button type="button" role="radio" data-mode="tr" data-i18n="modeTr">TR</button>
+          <button type="button" role="radio" data-mode="tr+en" data-i18n="modeTrEn">TR + EN</button>
+        </div>
+      </div>
+
+      <label class="range-row">
+        <span class="range-head"><span data-i18n="labelFontSize">Font size</span><output id="fontSize-out"></output></span>
+        <input type="range" id="fontSize" min="14" max="48" step="1" />
+      </label>
+
+      <label class="range-row">
+        <span class="range-head"><span data-i18n="labelPosition">Position from bottom</span><output id="bottomOffset-out"></output></span>
+        <input type="range" id="bottomOffset" min="2" max="40" step="1" />
+      </label>
+
+      <label class="range-row">
+        <span class="range-head"><span data-i18n="labelBackground">Background opacity</span><output id="bgOpacity-out"></output></span>
+        <input type="range" id="bgOpacity" min="0" max="1" step="0.05" />
+      </label>
+
+      <label class="check-row">
+        <input type="checkbox" id="hideOriginal" />
+        <span data-i18n="labelHideOriginal">Hide original subtitles</span>
+      </label>
+    </section>
+
+    <section class="preview-wrap">
+      <span class="label" data-i18n="labelPreview">Preview</span>
+      <div class="preview" id="preview">
+        <div class="preview-sub" id="preview-sub">
+          <span class="preview-tr" data-i18n="previewTr">Merhaba! Bu bir örnek altyazıdır.</span>
+          <span class="preview-en" data-i18n="previewEn">Hello! This is a sample subtitle.</span>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p data-i18n="privacyNote">Subtitle text is sent to Google Translate for translation.</p>
+      <p id="shortcut"></p>
+    </footer>
+
     <script type="module" src="./popup.ts"></script>
   </body>
 </html>

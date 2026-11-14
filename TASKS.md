@@ -62,12 +62,12 @@ phase, commit after each phase. See `CLAUDE.md`.
 - [x] Gates pass → commit
 
 ## Phase 6 — Popup, i18n, shortcut
-- [ ] `_locales/en/messages.json`, `_locales/tr/messages.json` (all UI + status strings,
+- [x] `_locales/en/messages.json`, `_locales/tr/messages.json` (all UI + status strings,
       extension name/description)
-- [ ] Popup UI per SPEC §7 (toggle, status, segmented mode, sliders, checkbox, live preview,
+- [x] Popup UI per SPEC §7 (toggle, status, segmented mode, sliders, checkbox, live preview,
       privacy note, shortcut hint, dark mode)
-- [ ] `commands` in manifest (Alt+Shift+T)
-- [ ] Gates pass → commit
+- [x] `commands` in manifest (Alt+Shift+T)
+- [x] Gates pass → commit
 
 ## Phase 7 — Assets, docs, packaging, final verification
 - [ ] `assets/icon.svg` (simple: speech-bubble/subtitle bars + "TR"), `npm run icons` → PNGs

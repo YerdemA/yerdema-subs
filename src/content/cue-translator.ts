@@ -9,6 +9,8 @@ export type SendTranslate = (texts: string[], videoKey?: string) => Promise<Tran
 export type TranslationState = 'idle' | 'translating' | 'done' | 'error';
 
 export const MAX_IN_FLIGHT = 2;
+/** Failed texts are retried automatically after this delay. */
+export const RETRY_FAILED_MS = 20000;
 
 export class CueTranslator {
   private cues: Cue[] = [];
@@ -17,6 +19,7 @@ export class CueTranslator {
   private readonly failed = new Set<string>();
   private active = 0;
   private destroyed = false;
+  private retryTimer: ReturnType<typeof setTimeout> | undefined;
   lastError: string | undefined;
 
   constructor(
@@ -53,6 +56,7 @@ export class CueTranslator {
 
   destroy(): void {
     this.destroyed = true;
+    if (this.retryTimer !== undefined) clearTimeout(this.retryTimer);
   }
 
   private pendingCount(): number {
@@ -119,6 +123,12 @@ export class CueTranslator {
     } else {
       this.lastError = res.error;
       chunk.forEach((t) => this.failed.add(t));
+    }
+    if (this.failed.size > 0 && this.retryTimer === undefined) {
+      this.retryTimer = setTimeout(() => {
+        this.retryTimer = undefined;
+        if (!this.destroyed) this.retryFailed();
+      }, RETRY_FAILED_MS);
     }
     this.onUpdate();
     this.pump();

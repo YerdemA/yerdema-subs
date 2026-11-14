@@ -44,3 +44,8 @@ Decisions taken during development (append below, one line each: decision — re
 - Status becomes `no-subtitles` (hint "Turn on CC (English)") when enabling CC failed or nothing arrived within 8 s.
 - `videoKey` for YouTube = `yt:<videoId>:<lang>` plus `:asr` for auto-generated tracks.
 - DOM fallback clears the overlay immediately when the native caption disappears and only debounces (350 ms) new text.
+- No `activeTab`/`tabs` permission: the popup uses `chrome.tabs.query` only for the tab id and `chrome.tabs.sendMessage`, which need no permission. Only `storage` is requested.
+- Popup slider changes update the UI/preview instantly and are saved debounced (250 ms) to stay within `storage.sync` write quotas; toggles/mode save immediately. Status is re-polled every 1 s while the popup is open.
+- Shortcut hint shows the shortcut actually assigned (`chrome.commands.getAll`), or a hint to set one if Chrome/Edge didn't assign Alt+Shift+T (conflicts).
+- Failed translations are retried automatically 20 s after a failure (rate-limit recovery), not only on a new cue list.
+- Status text keys: `status_<status with - → _>`; an unanswered GET_STATUS shows "This page isn't supported".

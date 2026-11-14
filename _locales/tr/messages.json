@@ -1,5 +1,43 @@
 {
-  "extName": { "message": "Yerdema Subs" },
-  "extDescription": { "message": "İngilizce video altyazılarını gerçek zamanlı olarak Türkçeye çevirir." },
-  "cmdToggle": { "message": "Türkçe altyazıyı aç/kapat" }
+  "extName": { "message": "Yerdema Subs", "description": "Eklenti adı" },
+  "extDescription": { "message": "YouTube ve HTML5 videolarındaki İngilizce altyazıları gerçek zamanlı olarak Türkçeye çevirir." },
+  "cmdToggle": { "message": "Türkçe altyazıyı aç/kapat" },
+
+  "toggleLabel": { "message": "Türkçe altyazı aç/kapat" },
+  "statusTitle": { "message": "Durum" },
+  "status_idle": { "message": "Altyazı bekleniyor…" },
+  "status_no_video": { "message": "Bu sayfada video bulunamadı." },
+  "status_no_subtitles": { "message": "Bu videoda kullanılabilir altyazı yok." },
+  "status_translating": { "message": "Altyazılar çevriliyor…" },
+  "status_active": { "message": "Türkçe altyazı etkin." },
+  "status_error": { "message": "Çeviri başarısız oldu. İngilizce metin gösteriliyor." },
+  "status_disabled": { "message": "Kapalı." },
+  "status_unsupported": { "message": "Bu sayfa desteklenmiyor." },
+
+  "detail_turnOnCC": { "message": "Oynatıcıda altyazıyı (CC, İngilizce) açın." },
+  "detail_noTrack": { "message": "Videoda altyazı parçası yok." },
+  "detail_cors": { "message": "Altyazı dosyası okunamadı (farklı kaynak / CORS)." },
+  "detail_loading": { "message": "Altyazı parçası yükleniyor…" },
+  "detail_notPlaying": { "message": "Videoyu oynatmaya başlayın." },
+  "detail_ad": { "message": "Reklam oynatılıyor." },
+  "detail_translateFailed": { "message": "Google Çeviri yanıt vermedi; birazdan tekrar denenecek." },
+
+  "source_youtube_intercept": { "message": "Kaynak: YouTube altyazıları" },
+  "source_youtube_dom": { "message": "Kaynak: YouTube ekran altyazıları" },
+  "source_html5": { "message": "Kaynak: HTML5 video altyazı parçası" },
+
+  "labelMode": { "message": "Görünüm" },
+  "modeTr": { "message": "TR" },
+  "modeTrEn": { "message": "TR + EN" },
+  "labelFontSize": { "message": "Yazı boyutu" },
+  "labelPosition": { "message": "Alttan konum" },
+  "labelBackground": { "message": "Arka plan opaklığı" },
+  "labelHideOriginal": { "message": "Orijinal altyazıları gizle" },
+  "labelPreview": { "message": "Önizleme" },
+  "previewTr": { "message": "Merhaba! Bu bir örnek altyazıdır." },
+  "previewEn": { "message": "Hello! This is a sample subtitle." },
+
+  "privacyNote": { "message": "Altyazı metni çeviri için Google Çeviri'ye gönderilir." },
+  "shortcutHint": { "message": "Kısayol: $1 altyazıyı açar/kapatır" },
+  "shortcutNotSet": { "message": "Tarayıcının eklenti kısayolları sayfasından bir kısayol atayın." }
 }
