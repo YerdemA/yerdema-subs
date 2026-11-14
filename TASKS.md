@@ -18,15 +18,15 @@ phase, commit after each phase. See `CLAUDE.md`.
 - [x] Gates pass → commit `chore: project scaffold`
 
 ## Phase 1 — Shared core logic (+ unit tests)
-- [ ] `types.ts` (Cue, Settings, Status, message unions)
-- [ ] `settings.ts` (defaults, clamp, load/save/subscribe)
-- [ ] `cues.ts` (`normalizeText`, `stripTags`, `findActiveCue`)
-- [ ] Verify Google endpoint with `curl`; save fixture `src/shared/__fixtures__/google-sample.json`
-- [ ] `google.ts` (URL builder, parser, alignment)
-- [ ] `batching.ts` (4000 encoded chars / 40 items)
-- [ ] `youtube-json3.ts` (parser + `mergeCues`) with manual + ASR fixtures
-- [ ] `cache.ts` (LRU + persisted per-video helpers, 30 videos)
-- [ ] All SPEC §11 tests written and green → commit
+- [x] `types.ts` (Cue, Settings, Status, message unions)
+- [x] `settings.ts` (defaults, clamp, load/save/subscribe)
+- [x] `cues.ts` (`normalizeText`, `stripTags`, `findActiveCue`)
+- [x] Verify Google endpoint with `curl`; save fixture `src/shared/__fixtures__/google-sample.json`
+- [x] `google.ts` (URL builder, parser, alignment)
+- [x] `batching.ts` (4000 encoded chars / 40 items)
+- [x] `youtube-json3.ts` (parser + `mergeCues`) with manual + ASR fixtures
+- [x] `cache.ts` (LRU + persisted per-video helpers, 30 videos)
+- [x] All SPEC §11 tests written and green → commit
 
 ## Phase 2 — Background service worker
 - [ ] `Translator` interface + `GoogleGtxTranslator`

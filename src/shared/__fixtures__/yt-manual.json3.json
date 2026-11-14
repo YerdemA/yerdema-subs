@@ -1,0 +1,16 @@
+{
+  "wireMagic": "pb3",
+  "pens": [{}],
+  "wsWinStyles": [{}],
+  "wpWinPositions": [{}],
+  "events": [
+    { "tStartMs": 0, "dDurationMs": 1200, "id": 1, "wpWinPosId": 0, "wsWinStyleId": 0 },
+    { "tStartMs": 1200, "dDurationMs": 2800, "segs": [{ "utf8": "Welcome back to the channel." }] },
+    { "tStartMs": 4000, "dDurationMs": 3000, "segs": [{ "utf8": "Today we&#39;re going to talk\nabout black holes." }] },
+    { "tStartMs": 7000, "dDurationMs": 1, "segs": [{ "utf8": "\n" }] },
+    { "tStartMs": 7500, "dDurationMs": 2500, "segs": [{ "utf8": "[Music]" }] },
+    { "tStartMs": 10500, "dDurationMs": 3500, "segs": [{ "utf8": "They're " }, { "utf8": "<i>really</i>" }, { "utf8": " strange &amp; fascinating." }] },
+    { "tStartMs": 14000, "segs": [{ "utf8": "   " }] },
+    { "tStartMs": 15000, "dDurationMs": 4000, "segs": [{ "utf8": "Let's   get   started!" }] }
+  ]
+}

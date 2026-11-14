@@ -16,3 +16,8 @@ Decisions taken during development (append below, one line each: decision — re
 - Popup is built with Vite root `src/popup` → `dist/popup/index.html`; background/content are Vite lib builds (ES / IIFE) via `scripts/build.mjs`.
 - `scripts/verify-dist.mjs` runs as part of `npm run build` (not only `package`) so every build is validated.
 - Dev deps: TypeScript 7, Vite 8, Vitest 5, jsdom, sharp (icons), fflate (zip), rimraf.
+- Persisted per-video cache stores a `text → translation` map (not a positional array) under `vc:<videoKey>` with a timestamp — stays valid if the cue list changes (manual vs ASR track, re-merge) and allows merging partial, priority-ordered results; LRU by timestamp keeps 30 videos.
+- `findActiveCue`: start inclusive / end exclusive; for overlapping cues the latest-started still-active cue wins.
+- ASR json3 is exploded into word fragments via `tOffsetMs`; overlapping rolling events are clamped (fragment end ≤ next fragment start) before `mergeCues`, otherwise inflated event durations would trigger the 7 s break too early. The 7 s limit is checked on the merged span `max(end) - start`.
+- Manual json3 events without `dDurationMs` end at the next event's start (3 s if last). HTML entities in caption text are decoded (`&#39;`, `&amp;`, ...).
+- Translation priority window: cues with `end ≥ t-5s` and `start ≤ t+60s` first, then later cues, then earlier ones.
