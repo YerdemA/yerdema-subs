@@ -18,6 +18,7 @@ const DOM_FALLBACK_DELAY_MS = 4000;
 const DOM_DEBOUNCE_MS = 350;
 const ENABLE_CC_DELAY_MS = 1500;
 const NO_SUBS_TIMEOUT_MS = 8000;
+const CC_RETRY_DELAY_MS = 10000;
 
 /** Reads the visible native caption text. */
 export function readCaptionText(root: ParentNode): string {
@@ -116,6 +117,7 @@ export class YouTubeAdapter implements Adapter {
   private adObserver: MutationObserver | null = null;
   private observedPlayer: HTMLElement | null = null;
   private adShowing = false;
+  private ccRetried = false;
 
   private readonly onMessage = (event: MessageEvent<unknown>): void => {
     if (event.source !== window) return;
@@ -124,6 +126,12 @@ export class YouTubeAdapter implements Adapter {
     if (msg.type === 'YT_CAPTIONS') this.onCaptions(msg);
     else if (msg.type === 'YT_CC_RESULT' && msg.videoId === this.videoId) {
       this.ccResult = { ok: msg.ok, detail: msg.detail };
+      // Player/tracklist not ready (slow load, ad): ask once more a bit later.
+      const videoId = this.videoId;
+      if (!msg.ok && !this.ccRetried && (msg.detail === 'noPlayer' || msg.detail === 'noTracks')) {
+        this.ccRetried = true;
+        this.later(() => this.requestCaptions(videoId), CC_RETRY_DELAY_MS);
+      }
     }
   };
   private readonly onNavigate = (): void => this.reset();
@@ -201,6 +209,7 @@ export class YouTubeAdapter implements Adapter {
     this.dom = null;
     this.current = null;
     this.ccResult = null;
+    this.ccRetried = false;
     this.captionsSeenAt = 0;
     this.overlay.show(null);
     this.applyHideStyle();
@@ -216,12 +225,7 @@ export class YouTubeAdapter implements Adapter {
     if (!videoId) return;
 
     this.post('YT_READY', videoId); // replay anything the MAIN world already captured
-    this.later(() => {
-      // Enable CC if nothing arrived yet, or upgrade ASR to a manual English track if one exists.
-      if (this.videoId === videoId && (!this.session || this.current?.kind === 'asr')) {
-        this.post('YT_ENABLE_CC', videoId);
-      }
-    }, ENABLE_CC_DELAY_MS);
+    this.later(() => this.requestCaptions(videoId), ENABLE_CC_DELAY_MS);
 
     // Poll: mount the overlay inside #movie_player, watch ads, decide on DOM fallback.
     this.pollTimer = window.setInterval(() => this.tick(), 500);
@@ -252,13 +256,21 @@ export class YouTubeAdapter implements Adapter {
     }
   }
 
+  /** Enable CC if nothing arrived yet, or upgrade ASR to a manual English track if one exists. */
+  private requestCaptions(videoId: string): void {
+    if (this.videoId !== videoId || this.adShowing) return; // after an ad ends we ask again
+    if (!this.session || this.current?.kind === 'asr') this.post('YT_ENABLE_CC', videoId);
+  }
+
   private watchAds(player: HTMLElement): void {
     if (this.observedPlayer === player) return;
     this.adObserver?.disconnect();
     this.observedPlayer = player;
     const update = (): void => {
+      const wasAd = this.adShowing;
       this.adShowing = player.classList.contains('ad-showing');
       this.overlay.setVisible(!this.adShowing);
+      if (wasAd && !this.adShowing && this.videoId) this.requestCaptions(this.videoId);
     };
     this.adObserver = new MutationObserver(update);
     this.adObserver.observe(player, { attributes: true, attributeFilter: ['class'] });

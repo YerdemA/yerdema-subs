@@ -37,8 +37,10 @@ Bu makineden `translate.googleapis.com` (SPEC'teki `client=gtx` adresi) her curl
   adresi hatırlar. `host_permissions` içine ikinci adres eklendi (SPEC §9'dan sapma).
 - Test fikstürü (`google-sample.json`) yedek adresten alındı; biçim SPEC §4.1 ile aynı.
 
-Tarayıcıdaki istekler curl'den farklı davranabilir; sabah çeviri gelmiyorsa
-`chrome://extensions` → Yerdema Subs → "Service worker" konsolundaki hatalara bakın.
+**Sonradan doğrulandı:** Eklentinin servis çalışanından (Playwright Chromium) yapılan istekte
+**her iki adres de HTTP 200** döndü ("Good morning" → "Günaydın"). Yani 429 yalnızca curl'e
+özgüydü; tarayıcıda SPEC'teki asıl adres çalışıyor, yedek adres yalnızca güvenlik ağı.
+Sabah çeviri gelmiyorsa `chrome://extensions` → Yerdema Subs → "Service worker" konsoluna bakın.
 
 ## SPEC'ten bilinçli sapmalar (ayrıntılar DECISIONS.md'de)
 
@@ -82,9 +84,14 @@ Elle tıklama yapılamadığı için doğrulama üç katmanda yapıldı:
    "This flower is beautiful." → **"Bu çiçek çok güzel."** Yani çeviri adresi tarayıcıdan bu
    makinede çalışıyor (curl'ün aldığı 429'a rağmen).
 
-YouTube adaptörü gerçek YouTube'da test **edilemedi** (oturum/çerez, reklam, oynatıcı API'si
-headless ortamda güvenilir değil); birim testleriyle doğrulandı. Sabah ilk olarak YouTube
-adımlarını (MANUAL_TEST.md bölüm 2–5) deneyin.
+**YouTube:** `E2E_YOUTUBE=1 npx playwright test e2e/youtube.spec.ts` ile gerçek YouTube'da
+denendi. YouTube, otomasyonla açılan Chromium'da (headless ve görünür pencerede) videoyu
+oynatmayı reddetti ("Something went wrong") — bot koruması, eklentiyle ilgisi yok. Yine de
+şu kısım **gerçek YouTube'da çalıştı**: MAIN-world betiği yüklendi, `#movie_player` API'si ile
+altyazı listesi okundu ve elle eklenmiş İngilizce parça seçildi (`YT_CC_RESULT: ok, manual`).
+Video oynamadığı için oynatıcı altyazı dosyasını indirmedi; yakalama (fetch/XHR) ve katman
+kısmı gerçek YouTube'da doğrulanamadı (birim testleriyle doğrulandı). **Sabah ilk olarak
+YouTube adımlarını (MANUAL_TEST.md bölüm 2–5) deneyin.**
 
 ## Engellenen maddeler
 

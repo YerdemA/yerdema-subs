@@ -107,7 +107,8 @@ uygulanmalı:
 
 ## Bilinen risk: Google hız sınırı
 
-Geliştirme makinesinden `translate.googleapis.com` (client=gtx) adresine yapılan **tüm** curl
-denemeleri HTTP 429 ("unusual traffic") döndü; `clients5.google.com` yedek adresi çalıştı.
-Eklenti önce asıl adresi, 429 alırsa yedek adresi dener. Altyazılar hiç Türkçeye dönmüyorsa
-Service worker konsolunda `HTTP 429` hatalarını kontrol edin ve not edin.
+Geliştirme makinesinden `translate.googleapis.com` (client=gtx) adresine yapılan curl
+denemeleri HTTP 429 döndü, ama aynı istek eklentinin servis çalışanından (Chromium) yapılınca
+HTTP 200 döndü. Eklenti önce asıl adresi, 429 alırsa `clients5.google.com` yedek adresini
+dener. Altyazılar hiç Türkçeye dönmüyorsa Service worker konsolunda `HTTP 429` hatalarını
+kontrol edin ve not edin.
