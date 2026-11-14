@@ -3,7 +3,7 @@
 ## Ne yapıldı
 
 SPEC.md'deki tüm kapsam (Phase 0–7) tamamlandı, her faz ayrı commit olarak kaydedildi
-(`git log --oneline`). `npm run typecheck`, `npm test` (98 test), `npm run build` ve
+(`git log --oneline`). `npm run typecheck`, `npm test` (101 birim testi), `npm run test:e2e` (4 Playwright testi), `npm run build` ve
 `npm run package` hatasız çalışıyor. Yüklemeye hazır paket:
 `release/yerdema-subs-v0.1.0.zip` (ya da `dist/` klasörü).
 
