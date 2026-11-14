@@ -37,12 +37,12 @@ phase, commit after each phase. See `CLAUDE.md`.
 - [x] Gates pass → commit
 
 ## Phase 3 — Overlay & sync
-- [ ] `overlay.ts` (Shadow DOM, modes, settings live update, pending-translation style)
-- [ ] Mounting strategies: inside a container (YouTube) / positioned over a video (generic,
+- [x] `overlay.ts` (Shadow DOM, modes, settings live update, pending-translation style)
+- [x] Mounting strategies: inside a container (YouTube) / positioned over a video (generic,
       ResizeObserver + scroll + fullscreen re-mount)
-- [ ] `sync.ts` (rAF only while playing, seeked update, binary search, change-only DOM writes)
-- [ ] Translation prioritization (current position first, then rest) driven from content side
-- [ ] Gates pass → commit
+- [x] `sync.ts` (rAF only while playing, seeked update, binary search, change-only DOM writes)
+- [x] Translation prioritization (current position first, then rest) driven from content side
+- [x] Gates pass → commit
 
 ## Phase 4 — Generic HTML5 adapter + test page
 - [ ] `adapters/html5.ts` per SPEC §5.2 (track choice, hidden mode, cue load, CORS null case,
