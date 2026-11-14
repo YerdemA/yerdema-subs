@@ -29,12 +29,12 @@ phase, commit after each phase. See `CLAUDE.md`.
 - [x] All SPEC §11 tests written and green → commit
 
 ## Phase 2 — Background service worker
-- [ ] `Translator` interface + `GoogleGtxTranslator`
-- [ ] Queue with max 2 concurrent batches, retry/backoff, item-by-item fallback on mismatch
-- [ ] Caches wired (memory + storage.local per videoKey)
-- [ ] `TRANSLATE` message handler (always responds, never throws)
-- [ ] `commands` handler for `toggle-subs`
-- [ ] Gates pass → commit
+- [x] `Translator` interface + `GoogleGtxTranslator`
+- [x] Queue with max 2 concurrent batches, retry/backoff, item-by-item fallback on mismatch
+- [x] Caches wired (memory + storage.local per videoKey)
+- [x] `TRANSLATE` message handler (always responds, never throws)
+- [x] `commands` handler for `toggle-subs`
+- [x] Gates pass → commit
 
 ## Phase 3 — Overlay & sync
 - [ ] `overlay.ts` (Shadow DOM, modes, settings live update, pending-translation style)

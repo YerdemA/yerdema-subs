@@ -21,3 +21,7 @@ Decisions taken during development (append below, one line each: decision — re
 - ASR json3 is exploded into word fragments via `tOffsetMs`; overlapping rolling events are clamped (fragment end ≤ next fragment start) before `mergeCues`, otherwise inflated event durations would trigger the 7 s break too early. The 7 s limit is checked on the merged span `max(end) - start`.
 - Manual json3 events without `dDurationMs` end at the next event's start (3 s if last). HTML entities in caption text are decoded (`&#39;`, `&amp;`, ...).
 - Translation priority window: cues with `end ≥ t-5s` and `start ≤ t+60s` first, then later cues, then earlier ones.
+- Translator keeps a sticky "preferred endpoint" (last one that worked); per attempt it tries every endpoint before applying the 1/2/4 s backoff. Non-JSON bodies (the HTML "Sorry" page) count as retryable. Non-429 4xx fail immediately.
+- Item-by-item fallback (concurrency 3) runs inside the batch's global slot (max 2 batch slots), so total in-flight requests are bounded.
+- Content side sends TRANSLATE messages of ≤ 40 texts each (one Google batch), so a failed batch only affects its own cues; the background also batches defensively.
+- Concurrent persisted-cache saves are serialized through a promise chain to avoid read-modify-write races.
