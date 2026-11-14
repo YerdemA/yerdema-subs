@@ -26,7 +26,7 @@ const server = createServer(async (req, res) => {
     let rel = decodeURIComponent(url.pathname);
     if (rel.endsWith('/')) rel += 'index.html';
     const file = path.resolve(root, '.' + rel);
-    if (!file.startsWith(root)) {
+    if (file !== root && !file.startsWith(root + path.sep)) {
       res.writeHead(403).end('Forbidden');
       return;
     }

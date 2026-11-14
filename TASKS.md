@@ -45,11 +45,11 @@ phase, commit after each phase. See `CLAUDE.md`.
 - [x] Gates pass → commit
 
 ## Phase 4 — Generic HTML5 adapter + test page
-- [ ] `adapters/html5.ts` per SPEC §5.2 (track choice, hidden mode, cue load, CORS null case,
+- [x] `adapters/html5.ts` per SPEC §5.2 (track choice, hidden mode, cue load, CORS null case,
       addtrack/cuechange, fullscreen)
-- [ ] `test-page/index.html` + `sample.en.vtt`, `scripts/serve.mjs` (no deps)
-- [ ] `content/main.ts` adapter selection + `GET_STATUS` responder
-- [ ] Gates pass → commit
+- [x] `test-page/index.html` + `sample.en.vtt`, `scripts/serve.mjs` (no deps)
+- [x] `content/main.ts` adapter selection + `GET_STATUS` responder
+- [x] Gates pass → commit
 
 ## Phase 5 — YouTube adapter
 - [ ] `youtube-main-world.ts` fetch + XHR interceptor for `/api/timedtext` → postMessage

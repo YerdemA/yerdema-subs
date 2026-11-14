@@ -30,3 +30,10 @@ Decisions taken during development (append below, one line each: decision — re
 - Content-side `CueTranslator` drives prioritization: each request takes the next ≤ 40-text batch from `prioritizeCueIndices(currentTime)`, recomputed on every request (so seeks re-prioritize automatically), max 2 requests in flight.
 - `sendTranslateMessage` retries an empty response / closed port up to 3 times (MV3 worker may be restarting), gives up immediately on "Extension context invalidated".
 - Failed translations keep the English text visible (pending style) and set status `error`; they are retried when the cue list is replaced or the session restarts.
+- When `enabled` is false the content script destroys the adapter entirely (no text is sent to Google, track modes/styles restored); re-enabling recreates it.
+- GET_STATUS with `all_frames`: frames that contain a `<video>` (and the YouTube top frame) answer immediately, video-less sub-frames stay silent, and a video-less top frame answers after 200 ms — so the popup sees the iframe that actually plays the video.
+- Status `detail` is a short code (`turnOnCC`, `noTrack`, `cors`, `loading`, `notPlaying`, `ad`, `translateFailed`); the popup localizes it via `detail_<code>` messages.
+- HTML5: before any video has been played the status is `idle` (detail `notPlaying`); videos are found with a debounced (500 ms) rescan of the live `getElementsByTagName('video')` collection on DOM mutations plus capture-phase `play`/`playing` listeners. A playing video is never switched away from.
+- HTML5 `videoKey` = `h5:` + FNV-1a hash of origin+path+currentSrc+track language/label (short, stable storage key).
+- YouTube embeds in third-party iframes (`youtube.com/embed`) are not handled: the MAIN-world interceptor only runs in the top frame, and the HTML5 adapter never runs on youtube.com.
+- Test page video has no `crossorigin` attribute (the MDN host might not send CORS headers); the VTT is same-origin so cues are readable anyway.
