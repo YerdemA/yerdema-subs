@@ -1,8 +1,8 @@
 // Popup: master toggle, status of the active tab, settings controls with live preview.
 import { localizeDocument, t } from '../shared/i18n';
-import { DEFAULT_SETTINGS, loadSettings, normalizeSettings, saveSettings, subscribeSettings } from '../shared/settings';
+import { DEFAULT_SETTINGS, isSiteDisabled, loadSettings, normalizeSettings, saveSettings, subscribeSettings, withSite } from '../shared/settings';
 import { isRecord, type Settings, type StatusInfo } from '../shared/types';
-import { statusMessageKey, detailMessageKey, sourceMessageKey, PREVIEW_SCALE } from './popup-logic';
+import { statusMessageKey, detailMessageKey, sourceMessageKey, formatCopyText, PREVIEW_SCALE } from './popup-logic';
 
 const $ = <T extends HTMLElement>(id: string): T => {
   const el = document.getElementById(id);
@@ -18,6 +18,9 @@ const hideOriginalEl = $<HTMLInputElement>('hideOriginal');
 const modeButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.segmented button'));
 
 let settings: Settings = { ...DEFAULT_SETTINGS };
+let lastStatus: StatusInfo | null = null;
+const siteDisabledEl = $<HTMLInputElement>('siteDisabled');
+const copyEl = $<HTMLButtonElement>('copy');
 
 function render(s: Settings): void {
   enabledEl.checked = s.enabled;
@@ -30,6 +33,7 @@ function render(s: Settings): void {
   $('bottomOffset-out').textContent = `${Math.round(s.bottomOffset)}%`;
   $('bgOpacity-out').textContent = `${Math.round(s.bgOpacity * 100)}%`;
   $('controls').classList.toggle('disabled', !s.enabled);
+  renderTabActions();
   renderPreview(s);
 }
 
@@ -80,12 +84,44 @@ window.addEventListener('pagehide', () => {
   if (Object.keys(pending).length > 0) void saveSettings(pending);
 });
 
+// --- per-tab actions (stretch: per-site disable, copy current subtitle) ---
+function renderTabActions(): void {
+  const host = lastStatus?.host;
+  $('tab-actions').hidden = !host;
+  $('site-row').hidden = !host;
+  if (host) {
+    $('site-host').textContent = `(${host})`;
+    siteDisabledEl.checked = isSiteDisabled(settings, host);
+  }
+  copyEl.disabled = !formatCopyText(lastStatus?.current);
+}
+
+siteDisabledEl.addEventListener('change', () => {
+  const host = lastStatus?.host;
+  if (!host) return;
+  update({ disabledSites: withSite(settings.disabledSites, host, siteDisabledEl.checked) }, true);
+});
+
+let copyTimer = 0;
+copyEl.addEventListener('click', () => {
+  const text = formatCopyText(lastStatus?.current);
+  if (!text) return;
+  void navigator.clipboard.writeText(text).then(() => {
+    const label = $('copy-label');
+    label.textContent = t('copied');
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => (label.textContent = t('copySubtitle')), 1500);
+  }).catch(() => undefined);
+});
+
 // --- status ---
 function showStatus(info: StatusInfo | null): void {
   const box = $('status');
   const main = $('status-main');
   const detail = $('status-detail');
   const source = $('status-source');
+  lastStatus = info;
+  renderTabActions();
   box.dataset.state = info ? info.status : 'unsupported';
   main.textContent = t(statusMessageKey(info?.status));
   const dKey = detailMessageKey(info?.detail);

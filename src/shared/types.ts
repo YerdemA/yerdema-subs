@@ -23,6 +23,8 @@ export interface Settings {
   /** 0–1 */
   bgOpacity: number;
   hideOriginal: boolean;
+  /** hostnames where the extension is switched off (stretch: per-site disable) */
+  disabledSites: string[];
 }
 
 export type Status =
@@ -36,10 +38,19 @@ export type Status =
 
 export type SubtitleSource = 'youtube-intercept' | 'youtube-dom' | 'html5';
 
+export interface CurrentSubtitle {
+  original: string;
+  translation?: string;
+}
+
 export interface StatusInfo {
   status: Status;
   detail?: string;
   source?: SubtitleSource;
+  /** hostname of the top-level page (for the per-site toggle) */
+  host?: string;
+  /** subtitle currently on screen (for the copy button) */
+  current?: CurrentSubtitle;
 }
 
 // content → background

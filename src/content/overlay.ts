@@ -108,6 +108,13 @@ export class Overlay {
     this.render();
   }
 
+  /** Subtitle currently on screen, or null. */
+  get current(): OverlayContent | null {
+    const c = this.content;
+    if (!this.visible || !this.settings.enabled || !c || !c.original.trim()) return null;
+    return { original: c.original, translation: c.translation?.trim() || undefined };
+  }
+
   /** Text currently displayed (for tests / debugging). */
   get displayedText(): string {
     if (this.wrap.hidden || this.box.hidden) return '';

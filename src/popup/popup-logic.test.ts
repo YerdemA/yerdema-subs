@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import en from '../../_locales/en/messages.json';
 import tr from '../../_locales/tr/messages.json';
-import { detailMessageKey, sourceMessageKey, statusMessageKey } from './popup-logic';
+import { detailMessageKey, formatCopyText, sourceMessageKey, statusMessageKey } from './popup-logic';
 import type { Status } from '../shared/types';
 
 const statuses: Status[] = ['idle', 'no-video', 'no-subtitles', 'translating', 'active', 'error', 'disabled'];
-const details = ['turnOnCC', 'noTrack', 'cors', 'loading', 'notPlaying', 'ad', 'translateFailed'];
+const details = ['turnOnCC', 'noTrack', 'cors', 'loading', 'notPlaying', 'ad', 'translateFailed', 'siteDisabled'];
 
 describe('popup message keys', () => {
   it('maps statuses, details and sources to keys that exist in both locales', () => {
@@ -28,6 +28,12 @@ describe('popup message keys', () => {
     expect(detailMessageKey('whatever')).toBeNull();
     expect(detailMessageKey(undefined)).toBeNull();
     expect(sourceMessageKey(undefined)).toBeNull();
+  });
+
+  it('formatCopyText puts TR first, then EN', () => {
+    expect(formatCopyText({ original: 'Hello', translation: 'Merhaba' })).toBe('Merhaba\nHello');
+    expect(formatCopyText({ original: 'Hello' })).toBe('Hello');
+    expect(formatCopyText(undefined)).toBe('');
   });
 
   it('locales have the same keys', () => {

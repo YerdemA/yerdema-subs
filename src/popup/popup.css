@@ -164,6 +164,39 @@ body {
   font-size: 12px;
 }
 
+/* per-tab actions */
+.tab-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: -4px 0 12px;
+}
+.site-host {
+  color: var(--muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.copy-btn {
+  align-self: flex-start;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--fg);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 550;
+  padding: 5px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+.copy-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.copy-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
 /* controls */
 .controls {
   display: flex;

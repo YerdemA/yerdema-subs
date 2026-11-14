@@ -39,5 +39,10 @@
 
   "privacyNote": { "message": "Subtitle text is sent to Google Translate for translation." },
   "shortcutHint": { "message": "Shortcut: $1 toggles subtitles" },
-  "shortcutNotSet": { "message": "Set a shortcut on the browser's extension shortcuts page." }
+  "shortcutNotSet": { "message": "Set a shortcut on the browser's extension shortcuts page." },
+
+  "labelDisableSite": { "message": "Disable on this site" },
+  "copySubtitle": { "message": "Copy current subtitle" },
+  "copied": { "message": "Copied!" },
+  "detail_siteDisabled": { "message": "Switched off on this site." }
 }

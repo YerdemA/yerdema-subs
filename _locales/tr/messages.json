@@ -39,5 +39,10 @@
 
   "privacyNote": { "message": "Altyazı metni çeviri için Google Çeviri'ye gönderilir." },
   "shortcutHint": { "message": "Kısayol: $1 altyazıyı açar/kapatır" },
-  "shortcutNotSet": { "message": "Tarayıcının eklenti kısayolları sayfasından bir kısayol atayın." }
+  "shortcutNotSet": { "message": "Tarayıcının eklenti kısayolları sayfasından bir kısayol atayın." },
+
+  "labelDisableSite": { "message": "Bu sitede kapat" },
+  "copySubtitle": { "message": "Geçerli altyazıyı kopyala" },
+  "copied": { "message": "Kopyalandı!" },
+  "detail_siteDisabled": { "message": "Bu sitede kapalı." }
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_SETTINGS, normalizeSettings } from './settings';
+import { DEFAULT_SETTINGS, isSiteDisabled, normalizeSettings, withSite } from './settings';
 
 describe('settings', () => {
   it('has the spec defaults', () => {
@@ -10,6 +10,7 @@ describe('settings', () => {
       bottomOffset: 10,
       bgOpacity: 0.6,
       hideOriginal: true,
+      disabledSites: [],
     });
   });
 
@@ -37,6 +38,24 @@ describe('settings', () => {
   it('keeps valid values and coerces numeric strings', () => {
     expect(
       normalizeSettings({ enabled: false, mode: 'tr+en', fontSize: '30', bottomOffset: 15.5, bgOpacity: 0.25, hideOriginal: false }),
-    ).toEqual({ enabled: false, mode: 'tr+en', fontSize: 30, bottomOffset: 15.5, bgOpacity: 0.25, hideOriginal: false });
+    ).toEqual({ enabled: false, mode: 'tr+en', fontSize: 30, bottomOffset: 15.5, bgOpacity: 0.25, hideOriginal: false, disabledSites: [] });
+  });
+
+  it('normalizes the per-site disable list', () => {
+    expect(normalizeSettings({ disabledSites: ['Example.com', ' a.org ', 'example.com', 3, ''] }).disabledSites).toEqual([
+      'example.com',
+      'a.org',
+    ]);
+    expect(normalizeSettings({ disabledSites: 'x' }).disabledSites).toEqual([]);
+  });
+
+  it('withSite adds/removes hosts and isSiteDisabled matches exactly', () => {
+    const list = withSite([], 'Example.com', true);
+    expect(list).toEqual(['example.com']);
+    expect(withSite(list, 'example.com', true)).toEqual(['example.com']);
+    expect(withSite(list, 'example.com', false)).toEqual([]);
+    const s = normalizeSettings({ disabledSites: list });
+    expect(isSiteDisabled(s, 'EXAMPLE.com')).toBe(true);
+    expect(isSiteDisabled(s, 'www.example.com')).toBe(false);
   });
 });

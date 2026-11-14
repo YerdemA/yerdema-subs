@@ -12,6 +12,8 @@
   ayarlanabilir. Sitenin kendi altyazısını gizleme seçeneği.
 - Açılır pencere tarayıcı diline göre Türkçe ya da İngilizce; **Alt+Shift+T** kısayolu ile
   aç/kapat.
+- Açılır pencerede "Bu sitede kapat" anahtarı ve "Geçerli altyazıyı kopyala" (Türkçe +
+  İngilizce) düğmesi.
 
 ## Sınırlamalar
 
@@ -55,6 +57,7 @@ Gereksinimler: Node 20+, npm. Windows, macOS ve Linux'ta çalışır.
 | `npm run package` | Derleme + `release/yerdema-subs-v<sürüm>.zip` |
 | `npm run icons` | `assets/icon.svg` dosyasından PNG simgeler üretir |
 | `npm run serve:test` | `test-page/` klasörünü http://localhost:5173 adresinde sunar (`PORT` ile değiştirilebilir) |
+| `npm run test:e2e` | Derleme + Playwright E2E: `dist/` klasörünü Chromium'a yükleyip test sayfasındaki katmanı kontrol eder (ilk sefer: `npx playwright install chromium`; gerçek Google için `E2E_REAL_TRANSLATE=1`) |
 
 Test sayfası (`npm run serve:test`) İngilizce VTT altyazılı, kısa ve döngüde oynayan bir HTML5
 video içerir — eklentinin çalıştığını görmenin en hızlı yolu.

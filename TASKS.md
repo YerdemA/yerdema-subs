@@ -79,8 +79,8 @@ phase, commit after each phase. See `CLAUDE.md`.
 
 ## Phase 8 — Stretch (only if all above is done)
 - [x] Playwright E2E on the test page with the unpacked extension
-- [ ] Per-site disable list
-- [ ] "Copy current subtitle" button
+- [x] Per-site disable list
+- [x] "Copy current subtitle" button
 
 ## Final report
 - [x] Write `REPORT.md` (Turkish): what was built, what works, known limitations, what to test

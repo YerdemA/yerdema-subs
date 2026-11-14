@@ -140,4 +140,38 @@ test('toggling enabled off removes the overlay text live', async () => {
     await chrome.storage.sync.set({ settings: { ...(data.settings ?? {}), enabled: true } });
   });
   await expect(page.locator('yerdema-subs-overlay .tr:not(.pending)')).toBeVisible({ timeout: 20_000 });
+
+  // GET_STATUS from the content script reports host + current subtitle (popup copy button).
+  const statuses = await worker.evaluate(async () => {
+    const tabs = await chrome.tabs.query({});
+    const out: unknown[] = [];
+    for (const tab of tabs) {
+      if (tab.id === undefined) continue;
+      try {
+        out.push(await chrome.tabs.sendMessage(tab.id, { type: 'GET_STATUS' }));
+      } catch {
+        // tab without content script
+      }
+    }
+    return out;
+  });
+  const live = statuses.find(
+    (s): s is { status: string; host: string; current?: { original: string; translation?: string } } =>
+      typeof s === 'object' && s !== null && (s as { current?: unknown }).current !== undefined,
+  );
+  expect(live?.host).toBe('localhost');
+  expect(live?.status).toMatch(/^(active|translating)$/);
+  expect(ENGLISH_CUES).toContain(live?.current?.original);
+
+  // Per-site disable (stretch): localhost on the list removes the overlay, removing it restores.
+  await worker.evaluate(async () => {
+    const data = await chrome.storage.sync.get('settings');
+    await chrome.storage.sync.set({ settings: { ...(data.settings ?? {}), disabledSites: ['localhost'] } });
+  });
+  await expect(page.locator('yerdema-subs-overlay')).toHaveCount(0, { timeout: 5_000 });
+  await worker.evaluate(async () => {
+    const data = await chrome.storage.sync.get('settings');
+    await chrome.storage.sync.set({ settings: { ...(data.settings ?? {}), disabledSites: [] } });
+  });
+  await expect(page.locator('yerdema-subs-overlay .tr:not(.pending)')).toBeVisible({ timeout: 20_000 });
 });

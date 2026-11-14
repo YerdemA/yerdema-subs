@@ -1,8 +1,10 @@
-import type { Settings, StatusInfo } from '../../shared/types';
+import type { CurrentSubtitle, Settings, StatusInfo } from '../../shared/types';
 
 /** A subtitle source adapter owns everything on the page while subtitles are enabled. */
 export interface Adapter {
   getStatus(): StatusInfo;
+  /** Subtitle currently on screen (copy button). */
+  getCurrent(): CurrentSubtitle | null;
   setSettings(settings: Settings): void;
   destroy(): void;
 }
@@ -16,4 +18,5 @@ export const Detail = {
   notPlaying: 'notPlaying',
   ad: 'ad',
   translateFailed: 'translateFailed',
+  siteDisabled: 'siteDisabled',
 } as const;

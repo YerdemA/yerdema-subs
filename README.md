@@ -13,6 +13,8 @@ video.
   background opacity. Option to hide the site's own subtitles.
 - Popup in Turkish or English (follows the browser language), keyboard shortcut **Alt+Shift+T**
   to toggle.
+- "Disable on this site" switch and a "Copy current subtitle" button (Turkish + English) in the
+  popup.
 
 ## Limitations
 
@@ -55,6 +57,7 @@ Requirements: Node 20+, npm. Works on Windows, macOS and Linux.
 | `npm run package` | Build + zip into `release/yerdema-subs-v<version>.zip` |
 | `npm run icons` | Generates PNG icons from `assets/icon.svg` |
 | `npm run serve:test` | Serves `test-page/` at http://localhost:5173 (`PORT` env to change) |
+| `npm run test:e2e` | Build + Playwright E2E: loads `dist/` into Chromium and checks the overlay on the test page (first run: `npx playwright install chromium`; `E2E_REAL_TRANSLATE=1` to use real Google instead of a mock) |
 
 The test page (`npm run serve:test`) contains a short looping HTML5 video with an English VTT
 track — the quickest way to see the extension working.
@@ -100,6 +103,7 @@ _locales/en, _locales/tr  UI strings
 assets/icon.svg          icon source → public/icons/*.png
 test-page/               HTML5 test page + sample.en.vtt
 scripts/                 build, verify-dist, zip, icons, static server
+e2e/                     Playwright end-to-end test
 ```
 
 Design decisions taken during development are listed in `DECISIONS.md`.

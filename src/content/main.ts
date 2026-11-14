@@ -1,6 +1,6 @@
 // Isolated-world content script entry: picks the adapter by hostname, owns the lifecycle,
 // applies settings live and answers GET_STATUS from the popup.
-import { loadSettings, subscribeSettings } from '../shared/settings';
+import { isSiteDisabled, loadSettings, subscribeSettings } from '../shared/settings';
 import { isRuntimeMessage, type Settings, type StatusInfo } from '../shared/types';
 import { Html5Adapter } from './adapters/html5';
 import type { Adapter } from './adapters/types';
@@ -12,6 +12,24 @@ function isYouTubeHost(hostname: string): boolean {
 
 const isTop = window.top === window;
 const onYouTube = isYouTubeHost(location.hostname);
+
+/** Hostname of the top-level page (iframes use ancestorOrigins). */
+function topHost(): string {
+  if (isTop) return location.hostname;
+  try {
+    const origins = location.ancestorOrigins;
+    const top = origins && origins.length > 0 ? origins[origins.length - 1] : undefined;
+    if (top) return new URL(top).hostname;
+  } catch {
+    // ignore
+  }
+  return location.hostname;
+}
+const siteHost = topHost();
+
+function isActive(s: Settings): boolean {
+  return s.enabled && !isSiteDisabled(s, siteHost);
+}
 
 let adapter: Adapter | null = null;
 let settings: Settings | null = null;
@@ -26,7 +44,7 @@ function createAdapter(s: Settings): Adapter | null {
 
 function apply(s: Settings): void {
   settings = s;
-  if (!s.enabled) {
+  if (!isActive(s)) {
     adapter?.destroy();
     adapter = null;
     return;
@@ -36,9 +54,13 @@ function apply(s: Settings): void {
 }
 
 function currentStatus(): StatusInfo {
-  if (!settings) return { status: 'idle' };
-  if (!settings.enabled) return { status: 'disabled' };
-  return adapter?.getStatus() ?? { status: 'no-video' };
+  const base = { host: siteHost };
+  if (!settings) return { ...base, status: 'idle' };
+  if (!settings.enabled) return { ...base, status: 'disabled' };
+  if (isSiteDisabled(settings, siteHost)) return { ...base, status: 'disabled', detail: 'siteDisabled' };
+  const status = adapter?.getStatus() ?? { status: 'no-video' as const };
+  const current = adapter?.getCurrent() ?? undefined;
+  return { ...status, ...base, ...(current ? { current } : {}) };
 }
 
 /** Frames that have something to report answer immediately; the top frame answers last. */

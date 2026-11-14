@@ -2,7 +2,7 @@
 // Primary: cues from intercepted /api/timedtext json3 (youtube-intercept).
 // Fallback: read the rendered caption DOM (youtube-dom) when no timedtext arrives.
 import { normalizeText } from '../../shared/cues';
-import { isPageMessage, MESSAGE_SOURCE, type Settings, type StatusInfo, type YtCaptionsMessage, type YtRequestMessage } from '../../shared/types';
+import { isPageMessage, MESSAGE_SOURCE, type CurrentSubtitle, type Settings, type StatusInfo, type YtCaptionsMessage, type YtRequestMessage } from '../../shared/types';
 import { json3ToCues } from '../../shared/youtube-json3';
 import { getWatchVideoId, payloadRank } from '../../shared/youtube';
 import { CueSession } from '../cue-session';
@@ -155,6 +155,10 @@ export class YouTubeAdapter implements Adapter {
       return { status: 'no-subtitles', detail: Detail.turnOnCC };
     }
     return { status: 'idle', detail: Detail.loading };
+  }
+
+  getCurrent(): CurrentSubtitle | null {
+    return this.overlay.current;
   }
 
   setSettings(settings: Settings): void {

@@ -1,7 +1,7 @@
 // Generic HTML5 adapter: reads native <video>.textTracks cues (SPEC §5.2).
 import { cleanCueText, sortCues } from '../../shared/cues';
 import { hashString } from '../../shared/cache';
-import type { Cue, Settings, StatusInfo } from '../../shared/types';
+import type { Cue, CurrentSubtitle, Settings, StatusInfo } from '../../shared/types';
 import { CueSession } from '../cue-session';
 import { Overlay } from '../overlay';
 import { Detail, type Adapter } from './types';
@@ -93,6 +93,10 @@ class VideoBinding {
       source: 'html5',
       ...(status === 'error' ? { detail: Detail.translateFailed } : {}),
     };
+  }
+
+  getCurrent(): CurrentSubtitle | null {
+    return this.overlay.current;
   }
 
   setSettings(settings: Settings): void {
@@ -214,6 +218,10 @@ export class Html5Adapter implements Adapter {
     if (this.binding) return this.binding.getStatus();
     if (this.videos.length === 0) return { status: 'no-video' };
     return { status: 'idle', detail: Detail.notPlaying, source: 'html5' };
+  }
+
+  getCurrent(): CurrentSubtitle | null {
+    return this.binding?.getCurrent() ?? null;
   }
 
   setSettings(settings: Settings): void {

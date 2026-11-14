@@ -69,16 +69,32 @@ Tam liste: `MANUAL_TEST.md`.
 
 ## Gerçek tarayıcıda doğrulama
 
-Bu ortamda tarayıcıya tıklanamadığı için doğrulama birim testleri (98), derleme çıktısı
-kontrolü (`scripts/verify-dist.mjs`: manifest, dosya referansları, içerik betiklerinde
-`import/export` olmaması, yerelleştirme anahtarları) ile yapıldı. Phase 8'deki Playwright
-E2E testinin sonucu aşağıda.
+Elle tıklama yapılamadığı için doğrulama üç katmanda yapıldı:
+
+1. **101 birim testi** (Vitest) — tüm saf mantık, YouTube json3/ASR birleştirme, çevirmen
+   kuyruğu/yeniden deneme, katman ve senkronizasyon, MAIN-world yakalayıcı.
+2. **`scripts/verify-dist.mjs`** her derlemede: manifest MV3, tüm dosya referansları mevcut,
+   içerik betiklerinde `import/export` yok, `eval` yok, yerelleştirme anahtarları tam.
+3. **Playwright E2E (`npm run test:e2e`, 4 test)** — paketlenmemiş eklenti gerçek Chromium'a
+   yüklendi: servis çalışanı açılıyor, test sayfasında katman videonun üzerinde Türkçe satır
+   gösteriyor, yerel altyazı gizleniyor, açılır pencere çiziliyor, aç/kapat ve site bazında
+   kapatma canlı çalışıyor. **Gerçek Google ile** (`E2E_REAL_TRANSLATE=1`) de geçti:
+   "This flower is beautiful." → **"Bu çiçek çok güzel."** Yani çeviri adresi tarayıcıdan bu
+   makinede çalışıyor (curl'ün aldığı 429'a rağmen).
+
+YouTube adaptörü gerçek YouTube'da test **edilemedi** (oturum/çerez, reklam, oynatıcı API'si
+headless ortamda güvenilir değil); birim testleriyle doğrulandı. Sabah ilk olarak YouTube
+adımlarını (MANUAL_TEST.md bölüm 2–5) deneyin.
 
 ## Engellenen maddeler
 
 Yok. Not: Mesajınızda geçen GitHub deposu (`YerdemA/yerdema-subs`) CLAUDE.md kuralı gereği
-uzak depo olarak **eklenmedi** ve hiçbir şey push edilmedi.
+uzak depo olarak **eklenmedi** ve hiçbir şey push edilmedi. İsterseniz:
+`git remote add origin https://github.com/YerdemA/yerdema-subs.git` ve `git push -u origin main`.
 
-## Phase 8 (stretch)
+## Phase 8 (stretch) — tamamlandı
 
-_Durum aşağıda güncellenecek._
+- **Playwright E2E** (yukarıda).
+- **Site bazında kapatma:** açılır pencerede "Bu sitede kapat (alan adı)". Ayarlara
+  `disabledSites` listesi eklendi (iframe'ler üst sayfanın alan adını kullanır).
+- **Geçerli altyazıyı kopyala:** Türkçe satır + İngilizce satır panoya kopyalanır.

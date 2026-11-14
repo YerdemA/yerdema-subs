@@ -79,6 +79,13 @@ uygulanmalı:
       pencere de karanlık görünür.
 - [ ] Tarayıcı dili Türkçe ise açılır pencere Türkçe, İngilizce ise İngilizce.
 
+## 6b. Ek özellikler
+
+- [ ] Video oynarken açılır pencerede **"Geçerli altyazıyı kopyala"** → bir metin düzenleyiciye
+      yapıştırın: önce Türkçe, alt satırda İngilizce satır gelir. Düğme "Kopyalandı!" der.
+- [ ] **"Bu sitede kapat (alan adı)"** işaretlenince o sitede altyazı kaybolur, durum "Kapalı. /
+      Bu sitede kapalı."; başka bir sitede çalışmaya devam eder. İşaret kaldırılınca geri gelir.
+
 ## 7. Klavye kısayolu
 
 - [ ] Video sayfasında **Alt+Shift+T** → altyazı kapanır; tekrar basınca açılır.
