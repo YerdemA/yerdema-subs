@@ -4,18 +4,18 @@ Rules: work top to bottom, check items off immediately, run quality gates at the
 phase, commit after each phase. See `CLAUDE.md`.
 
 ## Phase 0 — Setup
-- [ ] Verify `node -v` (≥ 20) and `git --version`; `git init` (initial commit with the spec files)
-- [ ] `package.json` (name `yerdema-subs`, version `0.1.0`, `"type": "module"`, private)
-- [ ] Install dev deps: typescript, vite, vitest, jsdom, @types/chrome, @types/node, sharp,
+- [x] Verify `node -v` (≥ 20) and `git --version`; `git init` (initial commit with the spec files)
+- [x] `package.json` (name `yerdema-subs`, version `0.1.0`, `"type": "module"`, private)
+- [x] Install dev deps: typescript, vite, vitest, jsdom, @types/chrome, @types/node, sharp,
       a zip library (e.g. `archiver` or `fflate`), rimraf
-- [ ] `tsconfig.json` (strict, ES2022, DOM, `types: ["chrome", "vite/client"]`)
-- [ ] Build setup: Vite builds popup (HTML) + background (ES module); content scripts built
+- [x] `tsconfig.json` (strict, ES2022, DOM, `types: ["chrome", "vite/client"]`)
+- [x] Build setup: Vite builds popup (HTML) + background (ES module); content scripts built
       separately as IIFE (Vite lib mode, one build per entry, via `scripts/build.mjs`);
       copy `manifest.json`, `_locales/`, `public/icons/` into `dist/`
-- [ ] npm scripts: typecheck, test, build, package, icons, serve:test
-- [ ] Vitest config (jsdom env for DOM tests)
-- [ ] Skeleton files for every module in SPEC §3 so the build passes end-to-end
-- [ ] Gates pass → commit `chore: project scaffold`
+- [x] npm scripts: typecheck, test, build, package, icons, serve:test
+- [x] Vitest config (jsdom env for DOM tests)
+- [x] Skeleton files for every module in SPEC §3 so the build passes end-to-end
+- [x] Gates pass → commit `chore: project scaffold`
 
 ## Phase 1 — Shared core logic (+ unit tests)
 - [ ] `types.ts` (Cue, Settings, Status, message unions)

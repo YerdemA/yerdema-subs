@@ -1,0 +1,5 @@
+{
+  "extName": { "message": "Yerdema Subs" },
+  "extDescription": { "message": "İngilizce video altyazılarını gerçek zamanlı olarak Türkçeye çevirir." },
+  "cmdToggle": { "message": "Türkçe altyazıyı aç/kapat" }
+}

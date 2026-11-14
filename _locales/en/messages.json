@@ -1,0 +1,5 @@
+{
+  "extName": { "message": "Yerdema Subs" },
+  "extDescription": { "message": "Translates English video subtitles to Turkish in real time." },
+  "cmdToggle": { "message": "Toggle Turkish subtitles" }
+}
