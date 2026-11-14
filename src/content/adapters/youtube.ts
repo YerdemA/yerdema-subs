@@ -165,7 +165,8 @@ export class YouTubeAdapter implements Adapter {
 
   private applyHideStyle(): void {
     const existing = document.getElementById(HIDE_STYLE_ID);
-    if (this.settings.hideOriginal) {
+    // Only hide native captions while we actually render something in their place.
+    if (this.settings.hideOriginal && (this.session !== null || this.dom !== null)) {
       if (existing) return;
       const style = document.createElement('style');
       style.id = HIDE_STYLE_ID;
@@ -198,6 +199,7 @@ export class YouTubeAdapter implements Adapter {
     this.ccResult = null;
     this.captionsSeenAt = 0;
     this.overlay.show(null);
+    this.applyHideStyle();
   }
 
   /** Full per-video reset (initial load and SPA navigation). */
@@ -242,6 +244,7 @@ export class YouTubeAdapter implements Adapter {
     if (visible && !this.captionsSeenAt) this.captionsSeenAt = Date.now();
     if (!this.dom && this.captionsSeenAt && Date.now() - this.captionsSeenAt >= DOM_FALLBACK_DELAY_MS) {
       this.dom = new DomCaptionMode(player, this.overlay);
+      this.applyHideStyle();
     }
   }
 
@@ -282,6 +285,7 @@ export class YouTubeAdapter implements Adapter {
     this.session = new CueSession(video, this.overlay, videoKey);
     this.session.setCues(cues);
     this.overlay.setVisible(!this.adShowing);
+    this.applyHideStyle();
   }
 
   destroy(): void {

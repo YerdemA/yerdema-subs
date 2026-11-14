@@ -70,12 +70,12 @@ phase, commit after each phase. See `CLAUDE.md`.
 - [x] Gates pass → commit
 
 ## Phase 7 — Assets, docs, packaging, final verification
-- [ ] `assets/icon.svg` (simple: speech-bubble/subtitle bars + "TR"), `npm run icons` → PNGs
-- [ ] `scripts/verify-dist.mjs`: validates manifest references exist & content bundles have no
+- [x] `assets/icon.svg` (simple: speech-bubble/subtitle bars + "TR"), `npm run icons` → PNGs
+- [x] `scripts/verify-dist.mjs`: validates manifest references exist & content bundles have no
       top-level import/export; run it as part of `npm run package`
-- [ ] `npm run package` → `release/yerdema-subs-v0.1.0.zip`
-- [ ] `README.md`, `README.tr.md`, `MANUAL_TEST.md` (Turkish), `DECISIONS.md` complete
-- [ ] Full gates + package pass → commit `chore: release v0.1.0`
+- [x] `npm run package` → `release/yerdema-subs-v0.1.0.zip`
+- [x] `README.md`, `README.tr.md`, `MANUAL_TEST.md` (Turkish), `DECISIONS.md` complete
+- [x] Full gates + package pass → commit `chore: release v0.1.0`
 
 ## Phase 8 — Stretch (only if all above is done)
 - [ ] Playwright E2E on the test page with the unpacked extension

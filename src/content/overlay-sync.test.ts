@@ -213,6 +213,31 @@ describe('CueTranslator', () => {
     expect(list[0]!.translation).toBe('A');
   });
 
+  it('auto-retries failures with growing delays and gives up after 5 retries', async () => {
+    vi.useFakeTimers();
+    let calls = 0;
+    const send = async () => {
+      calls++;
+      return { ok: false as const, error: 'HTTP 429' };
+    };
+    const tr = new CueTranslator(send, () => 0, () => {});
+    tr.setCues([{ id: 0, start: 0, end: 1, text: 'a' }]);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(calls).toBe(1);
+    await vi.advanceTimersByTimeAsync(19999);
+    expect(calls).toBe(1);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(calls).toBe(2); // +20 s
+    await vi.advanceTimersByTimeAsync(40000);
+    expect(calls).toBe(3); // +40 s
+    await vi.advanceTimersByTimeAsync(80000 + 160000 + 300000);
+    expect(calls).toBe(6);
+    await vi.advanceTimersByTimeAsync(3600000);
+    expect(calls).toBe(6); // gave up
+    tr.destroy();
+    vi.useRealTimers();
+  });
+
   it('dedupes identical texts and reuses known translations for new cue lists', async () => {
     const sent: string[] = [];
     const send = async (texts: string[]) => {

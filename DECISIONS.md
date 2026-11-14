@@ -49,3 +49,9 @@ Decisions taken during development (append below, one line each: decision — re
 - Shortcut hint shows the shortcut actually assigned (`chrome.commands.getAll`), or a hint to set one if Chrome/Edge didn't assign Alt+Shift+T (conflicts).
 - Failed translations are retried automatically 20 s after a failure (rate-limit recovery), not only on a new cue list.
 - Status text keys: `status_<status with - → _>`; an unanswered GET_STATUS shows "This page isn't supported".
+- Re-probe at the end of Phase 7: `translate.googleapis.com` gtx still HTTP 429 from this machine; MDN `flower.mp4` test video returns 200.
+- Overlay/popup CSS has an explicit `[hidden] { display: none !important; }` — author `display` rules otherwise override the `hidden` attribute.
+- Automatic retry of failed translations backs off 20 s → 40 s → 80 s → 160 s → 300 s and then stops (avoids hammering a rate-limited endpoint); a fresh cue list/new video starts over.
+- YouTube `hideOriginal` style is only injected while we render a replacement (intercept session or DOM mode), so native captions stay visible when we have nothing to show.
+- `enableCaptions` re-selects the best track even if it is already active when nothing was captured for that video yet (forces the player to request it).
+- Tabs open before installing the extension must be reloaded (documented in README/MANUAL_TEST) — no programmatic injection, to avoid the `scripting` permission.

@@ -43,7 +43,7 @@ const STYLE = `
   white-space: pre-line;
   overflow-wrap: anywhere;
 }
-.box[hidden], .wrap[hidden] { display: none; }
+[hidden] { display: none !important; }
 .tr { display: block; font-size: var(--ys-fs, 24px); font-weight: 500; }
 .en { display: block; font-size: calc(var(--ys-fs, 24px) * 0.75); opacity: 0.78; margin-top: 0.15em; }
 .pending { font-style: italic; opacity: 0.7; font-weight: 400; }

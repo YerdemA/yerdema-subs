@@ -162,7 +162,8 @@ function enableCaptions(videoId: string, attempt = 0): void {
     } catch {
       current = undefined;
     }
-    if (!sameTrack(current, best)) player.setOption('captions', 'track', best);
+    // Re-select even the same track when nothing was captured for this video yet.
+    if (!sameTrack(current, best) || !buffer.has(videoId)) player.setOption('captions', 'track', best);
     report(videoId, true, best.kind === 'asr' ? 'asr' : 'manual');
   } catch {
     report(videoId, false, 'error');

@@ -9,8 +9,10 @@ export type SendTranslate = (texts: string[], videoKey?: string) => Promise<Tran
 export type TranslationState = 'idle' | 'translating' | 'done' | 'error';
 
 export const MAX_IN_FLIGHT = 2;
-/** Failed texts are retried automatically after this delay. */
+/** Failed texts are retried automatically: 20 s, 40 s, 80 s, 160 s, 300 s, then give up. */
 export const RETRY_FAILED_MS = 20000;
+export const RETRY_FAILED_MAX_MS = 300000;
+export const MAX_AUTO_RETRIES = 5;
 
 export class CueTranslator {
   private cues: Cue[] = [];
@@ -20,6 +22,7 @@ export class CueTranslator {
   private active = 0;
   private destroyed = false;
   private retryTimer: ReturnType<typeof setTimeout> | undefined;
+  private autoRetries = 0;
   lastError: string | undefined;
 
   constructor(
@@ -124,11 +127,14 @@ export class CueTranslator {
       this.lastError = res.error;
       chunk.forEach((t) => this.failed.add(t));
     }
-    if (this.failed.size > 0 && this.retryTimer === undefined) {
+    if (res.ok && this.failed.size === 0) this.autoRetries = 0;
+    if (this.failed.size > 0 && this.retryTimer === undefined && this.autoRetries < MAX_AUTO_RETRIES) {
+      const delay = Math.min(RETRY_FAILED_MS * 2 ** this.autoRetries, RETRY_FAILED_MAX_MS);
+      this.autoRetries++;
       this.retryTimer = setTimeout(() => {
         this.retryTimer = undefined;
         if (!this.destroyed) this.retryFailed();
-      }, RETRY_FAILED_MS);
+      }, delay);
     }
     this.onUpdate();
     this.pump();
