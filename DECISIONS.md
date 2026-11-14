@@ -55,3 +55,4 @@ Decisions taken during development (append below, one line each: decision — re
 - YouTube `hideOriginal` style is only injected while we render a replacement (intercept session or DOM mode), so native captions stay visible when we have nothing to show.
 - `enableCaptions` re-selects the best track even if it is already active when nothing was captured for that video yet (forces the player to request it).
 - Tabs open before installing the extension must be reloaded (documented in README/MANUAL_TEST) — no programmatic injection, to avoid the `scripting` permission.
+- Playwright E2E (`npm run test:e2e`): persistent Chromium context (`channel: 'chromium'`, headless) with `--load-extension=dist`; Google endpoints are mocked via `context.route` by default (deterministic), `E2E_REAL_TRANSLATE=1` uses the real endpoints. With real translation the test page showed "Bu çiçek çok güzel." — the endpoint works from the browser on this machine.

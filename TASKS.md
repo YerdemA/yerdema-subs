@@ -78,7 +78,7 @@ phase, commit after each phase. See `CLAUDE.md`.
 - [x] Full gates + package pass → commit `chore: release v0.1.0`
 
 ## Phase 8 — Stretch (only if all above is done)
-- [ ] Playwright E2E on the test page with the unpacked extension
+- [x] Playwright E2E on the test page with the unpacked extension
 - [ ] Per-site disable list
 - [ ] "Copy current subtitle" button
 
