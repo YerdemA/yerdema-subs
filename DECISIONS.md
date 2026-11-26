@@ -64,3 +64,4 @@ Decisions taken during development (append below, one line each: decision — re
 
 ## v0.2
 - Drag-to-reposition reuses `bottomOffset` (vertical only, box stays centered) so the popup slider and drag stay in sync; max raised 40 → 85 % so the subtitle can sit near the top. Clicks on the subtitle are stopped from reaching the page (no accidental YouTube play/pause).
+- Subtitle delay is per video and not persisted (out-of-sync subtitles are a property of one video, a global value would break the next one). Lives in the content script; the popup sends `SET_DELAY` and reads it back via `GET_STATUS`. Not available in YouTube DOM-fallback mode (no timed cues there).

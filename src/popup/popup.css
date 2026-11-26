@@ -197,6 +197,33 @@ body {
   outline-offset: 1px;
 }
 
+/* subtitle delay */
+.delay-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.stepper output {
+  min-width: 52px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  font-weight: 600;
+}
+.stepper .copy-btn {
+  align-self: auto;
+  padding: 4px 8px;
+}
+#delay-reset:disabled {
+  visibility: hidden;
+}
+
 /* controls */
 .controls {
   display: flex;

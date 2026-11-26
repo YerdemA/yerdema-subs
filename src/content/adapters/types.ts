@@ -6,6 +6,8 @@ export interface Adapter {
   /** Subtitle currently on screen (copy button). */
   getCurrent(): CurrentSubtitle | null;
   setSettings(settings: Settings): void;
+  /** Subtitle delay for the current video (seconds, positive = later). No-op when unsupported. */
+  setDelay(sec: number): void;
   destroy(): void;
 }
 

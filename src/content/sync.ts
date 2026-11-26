@@ -2,6 +2,7 @@
 // seeked, binary-search lookup, and a callback only when the active cue (or its translation)
 // changes.
 import { findActiveCueIndex } from '../shared/cues';
+import { clampDelay, cueTime } from '../shared/delay';
 import type { Cue } from '../shared/types';
 
 export type ActiveCueListener = (cue: Cue | undefined) => void;
@@ -21,6 +22,7 @@ export class CueSync {
   private frame = 0;
   private running = false;
   private lastKey: string | null = null;
+  private delaySec = 0;
   private readonly onPlay = (): void => this.start();
   private readonly onStop = (): void => {
     this.stop();
@@ -51,13 +53,23 @@ export class CueSync {
     this.refresh();
   }
 
+  get delay(): number {
+    return this.delaySec;
+  }
+
+  /** Shifts subtitles in time (seconds, positive = later) and re-evaluates immediately. */
+  setDelay(sec: number): void {
+    this.delaySec = clampDelay(sec);
+    this.update();
+  }
+
   /** Forces a re-evaluation (e.g. a translation arrived for the current cue). */
   refresh(): void {
     this.update();
   }
 
   update(): void {
-    const i = findActiveCueIndex(this.cues, this.video.currentTime);
+    const i = findActiveCueIndex(this.cues, cueTime(this.video.currentTime, this.delaySec));
     const cue = i >= 0 ? this.cues[i] : undefined;
     const key = cue ? `${cue.id}|${cue.start}|${cue.text}|${cue.translation ?? ''}` : '';
     if (key === this.lastKey) return;

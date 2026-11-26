@@ -33,6 +33,15 @@
         <input type="checkbox" id="siteDisabled" />
         <span><span data-i18n="labelDisableSite">Disable on this site</span> <span class="site-host" id="site-host"></span></span>
       </label>
+      <div class="delay-row" id="delay-row" hidden>
+        <span class="label" data-i18n="labelDelay">Subtitle timing</span>
+        <div class="stepper">
+          <button type="button" class="copy-btn" id="delay-minus" data-i18n-aria="delayEarlier">&minus;0.5</button>
+          <output id="delay-out">0 s</output>
+          <button type="button" class="copy-btn" id="delay-plus" data-i18n-aria="delayLater">+0.5</button>
+          <button type="button" class="copy-btn" id="delay-reset" data-i18n="delayReset">Reset</button>
+        </div>
+      </div>
       <button type="button" class="copy-btn" id="copy" disabled>
         <span id="copy-label" data-i18n="copySubtitle">Copy current subtitle</span>
       </button>

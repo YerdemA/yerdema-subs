@@ -69,7 +69,12 @@ function frameHasVideo(): boolean {
 }
 
 chrome.runtime.onMessage.addListener((message: unknown, _sender, sendResponse) => {
-  if (!isRuntimeMessage(message) || message.type !== 'GET_STATUS') return false;
+  if (!isRuntimeMessage(message)) return false;
+  if (message.type === 'SET_DELAY') {
+    adapter?.setDelay(message.delay);
+    return false;
+  }
+  if (message.type !== 'GET_STATUS') return false;
   if (frameHasVideo() || (onYouTube && isTop)) {
     sendResponse(currentStatus());
     return false;

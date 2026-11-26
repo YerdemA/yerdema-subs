@@ -1,5 +1,6 @@
 // Ties together a <video>, a cue list, the overlay, the sync loop and the translator.
 // Used by both the YouTube intercept mode and the generic HTML5 adapter.
+import { cueTime } from '../shared/delay';
 import type { Cue, Status } from '../shared/types';
 import { CueSync, type FrameScheduler } from './sync';
 import { CueTranslator, sendTranslateMessage, type SendTranslate } from './cue-translator';
@@ -17,15 +18,17 @@ export class CueSession {
     send: SendTranslate = sendTranslateMessage,
     scheduler?: FrameScheduler,
     private readonly onChange?: () => void,
+    delaySec = 0,
   ) {
     this.sync = new CueSync(
       video,
       (cue) => this.overlay.show(cue ? { original: cue.text, translation: cue.translation } : null),
       scheduler,
     );
+    this.sync.setDelay(delaySec);
     this.translator = new CueTranslator(
       send,
-      () => this.video.currentTime,
+      () => cueTime(this.video.currentTime, this.sync.delay),
       () => {
         this.sync.refresh();
         this.onChange?.();
@@ -39,6 +42,15 @@ export class CueSession {
     this.sync.setCues(cues);
     this.translator.setCues(cues);
     this.onChange?.();
+  }
+
+  get delay(): number {
+    return this.sync.delay;
+  }
+
+  setDelay(sec: number): void {
+    this.sync.setDelay(sec);
+    this.translator.reprioritize();
   }
 
   retryFailed(): void {

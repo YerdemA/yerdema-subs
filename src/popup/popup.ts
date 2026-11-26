@@ -1,6 +1,7 @@
 // Popup: master toggle, status of the active tab, settings controls with live preview.
 import { localizeDocument, t } from '../shared/i18n';
 import { DEFAULT_SETTINGS, isSiteDisabled, loadSettings, normalizeSettings, saveSettings, subscribeSettings, withSite } from '../shared/settings';
+import { clampDelay, DELAY_STEP_SEC, formatDelay } from '../shared/delay';
 import { isRecord, type Settings, type StatusInfo } from '../shared/types';
 import { statusMessageKey, detailMessageKey, sourceMessageKey, formatCopyText, PREVIEW_SCALE } from './popup-logic';
 
@@ -94,7 +95,38 @@ function renderTabActions(): void {
     siteDisabledEl.checked = isSiteDisabled(settings, host);
   }
   copyEl.disabled = !formatCopyText(lastStatus?.current);
+  renderDelay();
 }
+
+// --- subtitle delay (per video, lives in the content script) ---
+/** Value the user just set; wins over polled status until the content script reports it. */
+let localDelay: number | null = null;
+
+function renderDelay(): void {
+  const reported = lastStatus?.delay;
+  if (localDelay !== null && reported === localDelay) localDelay = null;
+  const delay = localDelay ?? reported;
+  $('delay-row').hidden = delay === undefined;
+  if (delay === undefined) return;
+  $('delay-out').textContent = formatDelay(delay, t('secondsUnit'));
+  $<HTMLButtonElement>('delay-reset').disabled = delay === 0;
+}
+
+async function setDelay(delay: number): Promise<void> {
+  localDelay = clampDelay(delay);
+  renderDelay();
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab?.id !== undefined) await chrome.tabs.sendMessage(tab.id, { type: 'SET_DELAY', delay: localDelay });
+  } catch {
+    /* tab without content script */
+  }
+}
+
+const currentDelay = (): number => localDelay ?? lastStatus?.delay ?? 0;
+$('delay-minus').addEventListener('click', () => void setDelay(currentDelay() - DELAY_STEP_SEC));
+$('delay-plus').addEventListener('click', () => void setDelay(currentDelay() + DELAY_STEP_SEC));
+$('delay-reset').addEventListener('click', () => void setDelay(0));
 
 siteDisabledEl.addEventListener('change', () => {
   const host = lastStatus?.host;

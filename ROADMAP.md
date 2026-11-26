@@ -15,7 +15,7 @@ source when available (best quality, zero latency); STT is the fallback.
 | # | Item | Status |
 |---|------|--------|
 | 1 | Drag the subtitle to reposition it (saved per user, double-click resets) | done |
-| 4 | Subtitle delay adjustment (±, for out-of-sync subtitles) | todo |
+| 4 | Subtitle delay adjustment (±0.5 s steps in the popup, per video) | done |
 | 8 | Sentence integrity: translate sentences split across cues together | todo |
 | 12 | GitHub Actions: typecheck, tests, build and package on every push | todo |
 

@@ -2,6 +2,7 @@
 // Primary: cues from intercepted /api/timedtext json3 (youtube-intercept).
 // Fallback: read the rendered caption DOM (youtube-dom) when no timedtext arrives.
 import { normalizeText } from '../../shared/cues';
+import { clampDelay } from '../../shared/delay';
 import { isPageMessage, MESSAGE_SOURCE, type CurrentSubtitle, type Settings, type StatusInfo, type YtCaptionsMessage, type YtRequestMessage } from '../../shared/types';
 import { json3ToCues } from '../../shared/youtube-json3';
 import { getWatchVideoId, payloadRank } from '../../shared/youtube';
@@ -118,6 +119,8 @@ export class YouTubeAdapter implements Adapter {
   private observedPlayer: HTMLElement | null = null;
   private adShowing = false;
   private ccRetried = false;
+  /** Per-video subtitle delay; kept when a better track replaces the session. */
+  private delaySec = 0;
 
   private readonly onMessage = (event: MessageEvent<unknown>): void => {
     if (event.source !== window) return;
@@ -152,6 +155,7 @@ export class YouTubeAdapter implements Adapter {
       return {
         status,
         source: 'youtube-intercept',
+        delay: this.delaySec,
         ...(status === 'error' ? { detail: Detail.translateFailed } : {}),
       };
     }
@@ -173,6 +177,11 @@ export class YouTubeAdapter implements Adapter {
     this.settings = settings;
     this.overlay.setSettings(settings);
     this.applyHideStyle();
+  }
+
+  setDelay(sec: number): void {
+    this.delaySec = clampDelay(sec);
+    this.session?.setDelay(this.delaySec);
   }
 
   private applyHideStyle(): void {
@@ -220,6 +229,7 @@ export class YouTubeAdapter implements Adapter {
     const videoId = getWatchVideoId(location.href);
     if (videoId === this.videoId && (this.session || this.dom || this.pollTimer)) return;
     this.clearVideoState();
+    if (videoId !== this.videoId) this.delaySec = 0;
     this.videoId = videoId;
     this.startedAt = Date.now();
     if (!videoId) return;
@@ -298,7 +308,7 @@ export class YouTubeAdapter implements Adapter {
     this.dom = null;
     this.session?.destroy();
     const videoKey = `yt:${msg.videoId}:${msg.lang}${msg.kind === 'asr' ? ':asr' : ''}`;
-    this.session = new CueSession(video, this.overlay, videoKey);
+    this.session = new CueSession(video, this.overlay, videoKey, undefined, undefined, undefined, this.delaySec);
     this.session.setCues(cues);
     this.overlay.setVisible(!this.adShowing);
     this.applyHideStyle();

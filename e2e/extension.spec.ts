@@ -222,3 +222,45 @@ test('dragging the subtitle moves it, persists the position, double-click resets
     .toBe(10);
   await page.close();
 });
+
+test('subtitle delay from the popup shifts cues for the current video only', async () => {
+  const page = await context.newPage();
+  await page.goto('http://localhost:5173/');
+  const video = page.locator('video');
+  await page.evaluate(async () => {
+    const v = document.querySelector('video')!;
+    v.muted = true;
+    await v.play();
+  });
+  await expect(page.locator('yerdema-subs-overlay .box')).toBeVisible({ timeout: 20_000 });
+  // Park inside the first cue (sample.en.vtt: cue 1 starts at 0 s), then delay by +10 s:
+  // looking up t-10 < 0 means no subtitle should be shown.
+  await page.evaluate(() => {
+    const v = document.querySelector('video')!;
+    v.pause();
+    v.currentTime = 1;
+  });
+  await expect(page.locator('yerdema-subs-overlay .wrap')).toBeVisible();
+
+  let [worker] = context.serviceWorkers();
+  worker ??= await context.waitForEvent('serviceworker');
+  // Without the "tabs" permission URLs are hidden; target the active tab instead.
+  const send = async (delay: number): Promise<void> => {
+    await page.bringToFront();
+    await worker.evaluate(async (delay) => {
+      const [tab] = await chrome.tabs.query({ active: true });
+      await chrome.tabs.sendMessage(tab!.id!, { type: 'SET_DELAY', delay });
+    }, delay);
+  };
+  await send(10);
+  await expect(page.locator('yerdema-subs-overlay .wrap')).toBeHidden();
+  const status = await worker.evaluate(async () => {
+    const [tab] = await chrome.tabs.query({ active: true });
+    return chrome.tabs.sendMessage(tab!.id!, { type: 'GET_STATUS' });
+  });
+  expect((status as { delay?: number }).delay).toBe(10);
+  await send(0);
+  await expect(page.locator('yerdema-subs-overlay .wrap')).toBeVisible();
+  expect(await video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
+  await page.close();
+});

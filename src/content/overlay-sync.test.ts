@@ -162,6 +162,22 @@ const cues = (): Cue[] => [
 ];
 
 describe('CueSync', () => {
+  it('applies a subtitle delay (positive = later) and re-evaluates immediately', () => {
+    const video = new FakeVideo();
+    const seen: Array<string | undefined> = [];
+    const sync = new CueSync(video as unknown as HTMLVideoElement, (c) => seen.push(c?.text), manualScheduler());
+    sync.setCues(cues());
+    video.seek(1.5);
+    expect(seen.at(-1)).toBe('one');
+    sync.setDelay(1); // looks up t=0.5 → nothing yet
+    expect(seen.at(-1)).toBeUndefined();
+    sync.setDelay(-1.5); // looks up t=3.0 → 'two'
+    expect(seen.at(-1)).toBe('two');
+    expect(sync.delay).toBe(-1.5);
+    sync.setDelay(99);
+    expect(sync.delay).toBe(10);
+  });
+
   it('runs the rAF loop only while playing and notifies only on change', () => {
     const video = new FakeVideo();
     const sched = manualScheduler();

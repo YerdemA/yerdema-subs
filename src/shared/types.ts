@@ -51,6 +51,8 @@ export interface StatusInfo {
   host?: string;
   /** subtitle currently on screen (for the copy button) */
   current?: CurrentSubtitle;
+  /** subtitle delay in seconds; present only when the source supports it (timed cues) */
+  delay?: number;
 }
 
 // content → background
@@ -71,7 +73,13 @@ export interface GetStatusRequest {
 
 export type GetStatusResponse = StatusInfo;
 
-export type RuntimeMessage = TranslateRequest | GetStatusRequest;
+// popup → content: set the subtitle delay (seconds) for the current video
+export interface SetDelayRequest {
+  type: 'SET_DELAY';
+  delay: number;
+}
+
+export type RuntimeMessage = TranslateRequest | GetStatusRequest | SetDelayRequest;
 
 // MAIN world ↔ isolated world (window.postMessage)
 export const MESSAGE_SOURCE = 'yerdema-subs';
@@ -132,6 +140,7 @@ export function isPageMessage(value: unknown): value is PageMessage {
 export function isRuntimeMessage(value: unknown): value is RuntimeMessage {
   if (!isRecord(value)) return false;
   if (value.type === 'GET_STATUS') return true;
+  if (value.type === 'SET_DELAY') return typeof value.delay === 'number' && Number.isFinite(value.delay);
   if (value.type === 'TRANSLATE') {
     return (
       Array.isArray(value.texts) &&

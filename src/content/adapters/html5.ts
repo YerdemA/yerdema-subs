@@ -1,6 +1,7 @@
 // Generic HTML5 adapter: reads native <video>.textTracks cues (SPEC §5.2).
 import { cleanCueText, sortCues } from '../../shared/cues';
 import { hashString } from '../../shared/cache';
+import { clampDelay } from '../../shared/delay';
 import type { Cue, CurrentSubtitle, Settings, StatusInfo } from '../../shared/types';
 import { CueSession } from '../cue-session';
 import { Overlay } from '../overlay';
@@ -66,6 +67,7 @@ class VideoBinding {
   private status: StatusInfo = { status: 'idle', detail: Detail.loading, source: 'html5' };
   private pollTimer = 0;
   private lastCueCount = -1;
+  private delaySec = 0;
   private readonly onAddTrack = (): void => this.selectTrack();
   private readonly onCueChange = (): void => this.readCues();
   private readonly onTrackLoad = (): void => this.readCues();
@@ -91,12 +93,18 @@ class VideoBinding {
     return {
       status,
       source: 'html5',
+      delay: this.delaySec,
       ...(status === 'error' ? { detail: Detail.translateFailed } : {}),
     };
   }
 
   getCurrent(): CurrentSubtitle | null {
     return this.overlay.current;
+  }
+
+  setDelay(sec: number): void {
+    this.delaySec = clampDelay(sec);
+    this.session?.setDelay(this.delaySec);
   }
 
   setSettings(settings: Settings): void {
@@ -155,7 +163,7 @@ class VideoBinding {
     if (cues.length === 0) return;
     if (!this.session) {
       const key = `h5:${hashString(`${location.origin}${location.pathname}|${this.video.currentSrc}|${track.language}|${track.label}`)}`;
-      this.session = new CueSession(this.video, this.overlay, key);
+      this.session = new CueSession(this.video, this.overlay, key, undefined, undefined, undefined, this.delaySec);
     }
     this.session.setCues(cues);
   }
@@ -227,6 +235,10 @@ export class Html5Adapter implements Adapter {
   setSettings(settings: Settings): void {
     this.settings = settings;
     this.binding?.setSettings(settings);
+  }
+
+  setDelay(sec: number): void {
+    this.binding?.setDelay(sec);
   }
 
   private scheduleScan(delay: number): void {
