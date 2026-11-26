@@ -21,18 +21,27 @@ source when available (best quality, zero latency); STT is the fallback.
 
 ## v0.3 — Speech-to-text (STT) for content without subtitles
 
-Spike first (measure latency/quality on the user's machine), then productize.
+**Decided:** no budget → **local only, free** (no paid cloud APIs). Target hardware: the user's
+GTX 1650 Ti (4 GB VRAM) via WebGPU, with a WASM/CPU fallback.
 
-- Audio capture: `chrome.tabCapture` (user-gesture: popup button or keyboard shortcut) →
-  offscreen document → audio worklet (16 kHz mono). Works for any tab audio, not only `<video>`.
-- STT engine options (decision pending):
-  - **Local** (Whisper / Moonshine via transformers.js + WebGPU): free, private, offline;
-    100–250 MB one-time model download, needs a decent GPU.
-  - **Cloud streaming** (e.g. Deepgram, AssemblyAI, OpenAI realtime) with the user's own API
-    key: best quality and latency, paid per hour of audio.
+Source priority (user's design), per page:
+1. **Subtitles** (existing v0.1 pipeline) — best quality, zero latency.
+2. **Audio file found on the page** → process the file directly, *ahead of the playhead*
+   (same "current position first, then the rest" prioritization as translation). No live lag.
+   Works when the media URL is a plain file (mp3/m4a/mp4/ogg/wav: podcasts, news sites,
+   simple players). Not possible for `blob:`/MSE streams (YouTube, most course platforms) —
+   YouTube is covered by tier 1 anyway (auto captions).
+3. **Live transcription** of the tab's audio (`chrome.tabCapture` → offscreen document) —
+   universal fallback with ~1–3 s lag; DRM sites may block capture.
+
+Plan:
+- Spike: run Whisper (base/small) and Moonshine (tiny/base) via transformers.js + WebGPU on the
+  1650 Ti; measure speed (× real-time), accuracy and memory. Pick the model.
+- Shared STT engine in an offscreen document (model loaded once, one-time download cached).
+- Tier 3 (live) next: it makes "works everywhere" true. Then tier 2 as the quality/latency
+  upgrade where a file URL exists.
 - Translation waits for sentence boundaries (shares logic with #8) to avoid flicker.
-- Overlay without a `<video>` (e.g. podcasts, audio players): floating, draggable caption bar.
-- Expected limits: ~1–3 s lag (cannot hear the future); DRM sites may block capture.
+- Overlay without a `<video>` (e.g. `<audio>` players, podcasts): floating, draggable bar.
 
 ## Backlog (all ideas, unordered within groups)
 
@@ -49,7 +58,7 @@ Spike first (measure latency/quality on the user's machine), then productize.
 
 ### Translation quality
 - 8. Sentence integrity across cues → v0.2
-- 9. Alternative translators: DeepL or an LLM with the user's own API key (quality + 429 fallback)
+- 9. Alternative translators — **free options only** (budget: none); e.g. a local model later
 
 ### Distribution
 - 10. Publish to the Chrome Web Store (store assets, privacy policy, permission justifications)
