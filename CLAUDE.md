@@ -5,7 +5,7 @@ Turkish in real time.
 Goal: understand English content without interruption (not language learning). Original v0.1 requirements: `SPEC.md`. v0.1 progress: `TASKS.md`. Plan: `ROADMAP.md`.
 
 ## Working mode
-Interactive: the user is available. v0.1.0 is done (`TASKS.md`); current plan and all ideas
+Interactive: the user is available. v0.1.0 (`TASKS.md`) and v0.2.0 are released; current plan and all ideas
 live in `ROADMAP.md`. Ask only when a decision is genuinely the user's (e.g. paid services,
 product direction); otherwise choose the simplest option and log it in `DECISIONS.md`.
 

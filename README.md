@@ -16,6 +16,10 @@ video.
   to toggle.
 - "Disable on this site" switch and a "Copy current subtitle" button (Turkish + English) in the
   popup.
+- **Drag the subtitle** on the video to move it (double-click resets).
+- Per-video **timing adjustment** (±0.5 s steps) for out-of-sync subtitles.
+- **Sentences split across several cues are translated as a whole**; the Turkish sentence stays
+  on screen for all of its parts.
 
 ## Limitations
 
@@ -34,7 +38,8 @@ video.
 
 ## Install (Load unpacked)
 
-1. `npm install` then `npm run build` (or use `release/yerdema-subs-v0.1.0.zip`, unzipped).
+1. Download the latest `.zip` from [GitHub Releases](https://github.com/YerdemA/yerdema-subs/releases)
+   and unzip it (or `npm install` then `npm run build` to create `dist/`).
 2. **Chrome:** open `chrome://extensions`, enable **Developer mode**, click **Load unpacked** and
    select the `dist/` folder.
 3. **Edge:** open `edge://extensions`, enable **Developer mode**, click **Load unpacked** and

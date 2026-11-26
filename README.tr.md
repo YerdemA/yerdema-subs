@@ -15,6 +15,10 @@
   aç/kapat.
 - Açılır pencerede "Bu sitede kapat" anahtarı ve "Geçerli altyazıyı kopyala" (Türkçe +
   İngilizce) düğmesi.
+- Altyazıyı videonun üzerinde **sürükleyerek taşıma** (çift tık sıfırlar).
+- Kaymış altyazılar için video başına **zamanlama ayarı** (±0,5 sn adımlarla).
+- Birden fazla satıra bölünmüş **cümleler bütün olarak çevrilir**; Türkçe cümle tüm parçalar
+  boyunca ekranda kalır.
 
 ## Sınırlamalar
 
@@ -33,8 +37,9 @@
 
 ## Kurulum ("Paketlenmemiş öğe yükle")
 
-1. `npm install`, ardından `npm run build` (ya da `release/yerdema-subs-v0.1.0.zip` dosyasını
-   bir klasöre açın).
+1. [GitHub Releases](https://github.com/YerdemA/yerdema-subs/releases) sayfasından son
+   sürümün `.zip` dosyasını indirip bir klasöre açın (ya da `npm install` → `npm run build`
+   ile `dist/` oluşturun).
 2. **Chrome:** `chrome://extensions` adresini açın, **Geliştirici modu**nu açın,
    **Paketlenmemiş öğe yükle**'ye tıklayıp `dist/` klasörünü seçin.
 3. **Edge:** `edge://extensions` adresini açın, **Geliştirici modu**nu açın,

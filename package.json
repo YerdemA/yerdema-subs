@@ -1,6 +1,6 @@
 {
   "name": "yerdema-subs",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Real-time English to Turkish subtitle translation for YouTube and HTML5 videos (Chrome/Edge MV3).",

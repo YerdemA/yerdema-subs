@@ -10,7 +10,7 @@ The long-term path is **speech-to-text (STT)**: capture the tab's audio, transcr
 speech, translate it and show it in the same overlay. Existing subtitles remain the preferred
 source when available (best quality, zero latency); STT is the fallback.
 
-## v0.2 — Everyday polish (in progress)
+## v0.2 — Everyday polish (released as v0.2.0)
 
 | # | Item | Status |
 |---|------|--------|

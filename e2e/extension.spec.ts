@@ -5,10 +5,12 @@
 import { test, expect, chromium, type BrowserContext, type Route } from '@playwright/test';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { readFileSync } from 'node:fs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dist = path.join(root, 'dist');
 const realTranslate = process.env.E2E_REAL_TRANSLATE === '1';
+const version = (JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8')) as { version: string }).version;
 
 const ENGLISH_CUES = [
   'Hello and welcome!',
@@ -59,7 +61,7 @@ test('extension service worker starts with a valid manifest', async () => {
   expect(worker.url()).toMatch(/^chrome-extension:\/\/[a-p]{32}\/background\.js$/);
   const manifest = await worker.evaluate(() => chrome.runtime.getManifest());
   expect(manifest.manifest_version).toBe(3);
-  expect(manifest.version).toBe('0.1.0');
+  expect(manifest.version).toBe(version);
 });
 
 test('test page: overlay shows a translated subtitle', async () => {
@@ -107,7 +109,7 @@ test('popup renders and reports status for the active tab', async () => {
   await popup.setViewportSize({ width: 320, height: 640 });
   await popup.goto(`chrome-extension://${extensionId}/popup/index.html`);
   await expect(popup.locator('.name')).toHaveText('Yerdema Subs');
-  await expect(popup.locator('#version')).toHaveText('v0.1.0');
+  await expect(popup.locator('#version')).toHaveText(`v${version}`);
   await expect(popup.locator('#enabled')).toBeChecked();
   // The popup itself is the active tab here → no content script → "not supported".
   await expect(popup.locator('#status')).toHaveAttribute('data-state', 'unsupported');
