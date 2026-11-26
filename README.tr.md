@@ -1,4 +1,5 @@
 # Yerdema Subs
+[![CI](https://github.com/YerdemA/yerdema-subs/actions/workflows/ci.yml/badge.svg)](https://github.com/YerdemA/yerdema-subs/actions/workflows/ci.yml)
 
 İzlediğiniz videonun **İngilizce altyazılarını** okuyup gerçek zamanlı olarak **Türkçeye**
 çeviren ve videonun üzerinde gösteren bir Chrome / Edge (Manifest V3) eklentisi.

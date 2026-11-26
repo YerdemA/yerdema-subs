@@ -17,7 +17,7 @@ source when available (best quality, zero latency); STT is the fallback.
 | 1 | Drag the subtitle to reposition it (saved per user, double-click resets) | done |
 | 4 | Subtitle delay adjustment (±0.5 s steps in the popup, per video) | done |
 | 8 | Sentence integrity: translate sentences split across cues together | done |
-| 12 | GitHub Actions: typecheck, tests, build and package on every push | todo |
+| 12 | GitHub Actions: typecheck, tests, build, package and E2E on every push; `v*` tag → GitHub release with the zip | done |
 
 ## v0.3 — Speech-to-text (STT) for content without subtitles
 

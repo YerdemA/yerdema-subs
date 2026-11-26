@@ -1,4 +1,5 @@
 # Yerdema Subs
+[![CI](https://github.com/YerdemA/yerdema-subs/actions/workflows/ci.yml/badge.svg)](https://github.com/YerdemA/yerdema-subs/actions/workflows/ci.yml)
 
 A Chrome / Edge (Manifest V3) extension that reads the **English subtitles** of the video you are
 watching, translates them to **Turkish** in real time and shows them as an overlay on top of the
