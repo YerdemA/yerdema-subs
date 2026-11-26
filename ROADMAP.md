@@ -40,7 +40,18 @@ Plan:
 - Segment audio with a VAD (cut at pauses) instead of fixed chunks.
 - **Tier 3 (live) implemented:** popup button / Alt+Shift+L, offscreen capture, energy VAD,
   moonshine-base worker, translated captions over the video or as a floating bar. Cached start
-  ~6 s, first start ~70 s (model download). Next: tier 2 (audio file found on the page).
+  ~6 s, first start ~70 s (model download).
+- **Live v2 after user feedback (2026-11-26):** only translated sentences shown, 400 ms pause /
+  5 s max segments, no interim English. Measured: speech end → Turkish median ~1 s, p90 ~2.2 s,
+  13/13 sentences translated. User confirmed "much better".
+
+### Next session (start here)
+1. Release **v0.3.0** (live translation) — bump version, tag, CI publishes the zip.
+2. Live quality: very short fragments translate poorly ("Ben bir hükümettim"); consider
+   joining a fragment with the next one when it ends without punctuation, or showing the
+   previous sentence as a dimmed second line. Keep latency ≤ ~2 s (measure with the live E2E).
+3. Silero VAD if music/noise-heavy content cuts badly (energy VAD now).
+4. Tier 2: process an audio/video file found on the page ahead of the playhead (no lag).
 - Shared STT engine in an offscreen document (model loaded once, one-time download cached).
 - Tier 3 (live) next: it makes "works everywhere" true. Then tier 2 as the quality/latency
   upgrade where a file URL exists.
