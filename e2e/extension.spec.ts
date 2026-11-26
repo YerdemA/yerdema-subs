@@ -175,3 +175,50 @@ test('toggling enabled off removes the overlay text live', async () => {
   });
   await expect(page.locator('yerdema-subs-overlay .tr:not(.pending)')).toBeVisible({ timeout: 20_000 });
 });
+
+test('dragging the subtitle moves it, persists the position, double-click resets it', async () => {
+  const page = await context.newPage();
+  await page.goto('http://localhost:5173/');
+  await page.evaluate(async () => {
+    const v = document.querySelector('video')!;
+    v.muted = true;
+    await v.play();
+  });
+  const box = page.locator('yerdema-subs-overlay .box');
+  await expect(box).toBeVisible({ timeout: 20_000 });
+  await page.evaluate(() => document.querySelector('video')!.pause());
+
+  const before = (await box.boundingBox())!;
+  const x = before.x + before.width / 2;
+  const y = before.y + before.height / 2;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x, y - 60, { steps: 6 });
+  await page.mouse.up();
+  const after = (await box.boundingBox())!;
+  expect(before.y - after.y).toBeGreaterThan(45);
+  // Clicking the subtitle must not start playback (event does not reach the page/video).
+  expect(await page.evaluate(() => document.querySelector('video')!.paused)).toBe(true);
+
+  let [worker] = context.serviceWorkers();
+  worker ??= await context.waitForEvent('serviceworker');
+  await expect
+    .poll(async () =>
+      worker.evaluate(async () => {
+        const d = await chrome.storage.sync.get('settings');
+        return (d.settings as { bottomOffset?: number } | undefined)?.bottomOffset ?? 10;
+      }),
+    )
+    .toBeGreaterThan(15);
+
+  await box.dblclick();
+  await expect
+    .poll(async () =>
+      worker.evaluate(async () => {
+        const d = await chrome.storage.sync.get('settings');
+        return (d.settings as { bottomOffset?: number } | undefined)?.bottomOffset;
+      }),
+    )
+    .toBe(10);
+  await page.close();
+});

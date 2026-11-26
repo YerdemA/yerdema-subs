@@ -31,6 +31,7 @@
   "modeTrEn": { "message": "TR + EN" },
   "labelFontSize": { "message": "Yazı boyutu" },
   "labelPosition": { "message": "Alttan konum" },
+  "dragHint": { "message": "İpucu: altyazıyı videonun üzerinde sürükleyerek taşıyabilirsiniz; çift tık sıfırlar." },
   "labelBackground": { "message": "Arka plan opaklığı" },
   "labelHideOriginal": { "message": "Orijinal altyazıları gizle" },
   "labelPreview": { "message": "Önizleme" },

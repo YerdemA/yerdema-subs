@@ -18,7 +18,7 @@ export interface Settings {
   mode: Mode;
   /** px, 14–48 */
   fontSize: number;
-  /** % of video height from bottom, 2–40 */
+  /** % of video height from bottom, 2–85 (popup slider or drag on the subtitle) */
   bottomOffset: number;
   /** 0–1 */
   bgOpacity: number;

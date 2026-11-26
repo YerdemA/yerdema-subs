@@ -1,24 +1,16 @@
 # CLAUDE.md — Working rules for this repo
 
 Project: **Yerdema Subs** — Chrome/Edge MV3 extension that translates English video subtitles to
-Turkish in real time. Full requirements: `SPEC.md` (source of truth). Progress: `TASKS.md`.
+Turkish in real time.
+Goal: understand English content without interruption (not language learning). Original v0.1 requirements: `SPEC.md`. v0.1 progress: `TASKS.md`. Plan: `ROADMAP.md`.
 
-## Autonomous mode (most important)
-The user is asleep and will NOT answer questions. Work **without stopping** until every item in
-`TASKS.md` (excluding stretch goals unless DoD is done) is checked.
-- **Never ask the user anything.** Never end a turn with "Should I continue?" / "Devam edeyim mi?".
-- When something is ambiguous, choose the simplest option that satisfies `SPEC.md`, write it in
-  `DECISIONS.md` (one line: decision + reason), and continue.
-- When blocked (e.g. an API behaves differently than the spec says), find a workaround, log it in
-  `DECISIONS.md`, continue. Only stop entirely if the environment itself is broken (e.g. Node
-  missing) — then write the problem at the top of `TASKS.md` under `## BLOCKED`.
-- After finishing a phase, immediately start the next one.
-- If a fix attempt fails 3 times, simplify the approach instead of retrying the same thing.
+## Working mode
+Interactive: the user is available. v0.1.0 is done (`TASKS.md`); current plan and all ideas
+live in `ROADMAP.md`. Ask only when a decision is genuinely the user's (e.g. paid services,
+product direction); otherwise choose the simplest option and log it in `DECISIONS.md`.
 
 ## State & memory
-- `TASKS.md` is the persistent state. Check items off (`- [x]`) as soon as they're done.
-  After a context compaction or restart, re-read `CLAUDE.md`, `SPEC.md` and `TASKS.md` and
-  resume from the first unchecked item.
+- `ROADMAP.md` is the persistent state for new work; update item status as it changes.
 - Keep `DECISIONS.md` updated.
 
 ## Quality gates (run after every phase, fix before committing)
@@ -27,7 +19,7 @@ The user is asleep and will NOT answer questions. Work **without stopping** unti
 3. `npm run build` (from Phase 2 onwards)
 
 ## Git
-- Repo is local only. **Never `git push`**, never add remotes.
+- Remote: `origin` = github.com/YerdemA/yerdema-subs (public). Push only when the user asks.
 - Commit after each completed phase (more often is fine). Conventional Commits in English,
   e.g. `feat(youtube): intercept timedtext responses`.
 - Never commit `node_modules/`, `dist/`, `release/`.
@@ -38,7 +30,7 @@ The user is asleep and will NOT answer questions. Work **without stopping** unti
 - Code, comments, commit messages, README.md: English. `README.tr.md`, `MANUAL_TEST.md`: Turkish.
 - No runtime dependencies. Keep dev dependencies minimal.
 - npm scripts must work on **Windows 11** (cross-platform; use Node scripts, not `rm`/`cp`).
-- Don't add features outside `SPEC.md` (stretch goals only after DoD).
+- New features come from `ROADMAP.md`.
 
 ## Environment notes
 - The user's machine is Windows 11; the shell may be Git Bash. Use forward slashes in paths in

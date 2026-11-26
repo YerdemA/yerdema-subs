@@ -28,7 +28,7 @@ describe('settings', () => {
     });
     expect(normalizeSettings({ fontSize: 100, bottomOffset: 99, bgOpacity: 5 })).toMatchObject({
       fontSize: 48,
-      bottomOffset: 40,
+      bottomOffset: 85,
       bgOpacity: 1,
     });
     expect(normalizeSettings({ fontSize: NaN }).fontSize).toBe(24);

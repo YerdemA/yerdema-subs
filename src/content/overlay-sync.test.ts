@@ -60,6 +60,46 @@ describe('Overlay', () => {
     mo.disconnect();
   });
 
+  it('drags the subtitle vertically and reports the new offset once', () => {
+    const onReposition = vi.fn();
+    const o = new Overlay(settings({ bottomOffset: 10 }), document, { onReposition });
+    o.show({ original: 'Hello', translation: 'Merhaba' });
+    const box = o.shadow.querySelector<HTMLElement>('.box')!;
+    // overlay: top 0, height 400; box bottom at 360 (10% from bottom)
+    o.host.getBoundingClientRect = () => new DOMRect(0, 0, 600, 400);
+    box.getBoundingClientRect = () => new DOMRect(200, 320, 200, 40);
+    const pe = (type: string, clientY: number): Event =>
+      new PointerEvent(type, { pointerId: 1, button: 0, clientY, bubbles: true });
+
+    const pageClick = vi.fn();
+    document.addEventListener('pointerdown', pageClick);
+    box.dispatchEvent(pe('pointerdown', 340));
+    expect(o.isDragging).toBe(true);
+    box.dispatchEvent(pe('pointermove', 300)); // up 40px → bottom 320 → 20%
+    expect(o.host.style.getPropertyValue('--ys-bottom')).toBe('20%');
+    expect(onReposition).not.toHaveBeenCalled();
+    box.dispatchEvent(pe('pointerup', 300));
+    expect(o.isDragging).toBe(false);
+    expect(onReposition).toHaveBeenCalledExactlyOnceWith(20);
+    expect(pageClick).not.toHaveBeenCalled();
+    document.removeEventListener('pointerdown', pageClick);
+  });
+
+  it('ignores tiny movements and resets the position on double-click', () => {
+    const onReposition = vi.fn();
+    const o = new Overlay(settings({ bottomOffset: 30 }), document, { onReposition });
+    const box = o.shadow.querySelector<HTMLElement>('.box')!;
+    const pe = (type: string, clientY: number): Event =>
+      new PointerEvent(type, { pointerId: 1, button: 0, clientY });
+    box.dispatchEvent(pe('pointerdown', 100));
+    box.dispatchEvent(pe('pointermove', 101));
+    box.dispatchEvent(pe('pointerup', 101));
+    expect(onReposition).not.toHaveBeenCalled();
+    box.dispatchEvent(new MouseEvent('dblclick'));
+    expect(onReposition).toHaveBeenCalledExactlyOnceWith(DEFAULT_SETTINGS.bottomOffset);
+    expect(o.host.style.getPropertyValue('--ys-bottom')).toBe(`${DEFAULT_SETTINGS.bottomOffset}%`);
+  });
+
   it('mounts inside a container and over a video', () => {
     const container = document.createElement('div');
     document.body.append(container);

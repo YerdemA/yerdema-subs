@@ -15,7 +15,7 @@ export const MAX_DISABLED_SITES = 500;
 
 export const LIMITS = {
   fontSize: { min: 14, max: 48 },
-  bottomOffset: { min: 2, max: 40 },
+  bottomOffset: { min: 2, max: 85 },
   bgOpacity: { min: 0, max: 1 },
 } as const;
 

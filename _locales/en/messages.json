@@ -31,6 +31,7 @@
   "modeTrEn": { "message": "TR + EN" },
   "labelFontSize": { "message": "Font size" },
   "labelPosition": { "message": "Position from bottom" },
+  "dragHint": { "message": "Tip: drag the subtitle on the video to move it; double-click resets." },
   "labelBackground": { "message": "Background opacity" },
   "labelHideOriginal": { "message": "Hide original subtitles" },
   "labelPreview": { "message": "Preview" },

@@ -2,7 +2,22 @@
 //  - mountInside(container): host fills a positioned container (YouTube #movie_player)
 //  - mountOver(video): host is fixed-positioned over a <video> and follows it
 //    (ResizeObserver + scroll/resize + fullscreen re-mount)
+import { bottomOffsetFromDrag } from '../shared/position';
+import { DEFAULT_SETTINGS, saveSettings } from '../shared/settings';
 import type { Settings } from '../shared/types';
+
+export interface OverlayOptions {
+  /** Called with the new `bottomOffset` after the user drags (or double-click resets) the box. */
+  onReposition?: (bottomOffset: number) => void;
+}
+
+const DRAG_THRESHOLD_PX = 3;
+
+const persistOffset = (bottomOffset: number): void => {
+  saveSettings({ bottomOffset }).catch(() => {
+    /* storage unavailable (e.g. extension reloaded); position stays for this page only */
+  });
+};
 
 export interface OverlayContent {
   /** English text */
@@ -42,7 +57,13 @@ const STYLE = `
   text-shadow: 0 0 2px #000, 0 1px 3px rgba(0, 0, 0, 0.9);
   white-space: pre-line;
   overflow-wrap: anywhere;
+  pointer-events: auto;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
 }
+.box.dragging { cursor: grabbing; outline: 1px dashed rgba(255, 255, 255, 0.6); }
 [hidden] { display: none !important; }
 .tr { display: block; font-size: var(--ys-fs, 24px); font-weight: 500; }
 .en { display: block; font-size: calc(var(--ys-fs, 24px) * 0.75); opacity: 0.78; margin-top: 0.15em; }
@@ -61,9 +82,13 @@ export class Overlay {
   private visible = true;
   private lastKey: string | null = null;
   private cleanupMount: (() => void) | null = null;
+  private readonly onReposition: (bottomOffset: number) => void;
+  private drag: { pointerId: number; startY: number; startBottom: number; offset: number | null } | null =
+    null;
 
-  constructor(settings: Settings, doc: Document = document) {
+  constructor(settings: Settings, doc: Document = document, options: OverlayOptions = {}) {
     this.settings = settings;
+    this.onReposition = options.onReposition ?? persistOffset;
     this.host = doc.createElement('yerdema-subs-overlay');
     this.host.setAttribute('data-yerdema-subs', '');
     this.root = this.host.attachShadow({ mode: 'open' });
@@ -82,6 +107,7 @@ export class Overlay {
     this.root.append(style, this.wrap);
     this.applySettings();
     this.render();
+    this.bindDrag();
   }
 
   get shadow(): ShadowRoot {
@@ -123,6 +149,65 @@ export class Overlay {
       .map((el) => el.textContent ?? '')
       .join('\n')
       .trim();
+  }
+
+  /** Whether the user is currently dragging the subtitle box. */
+  get isDragging(): boolean {
+    return this.drag !== null;
+  }
+
+  private bindDrag(): void {
+    const box = this.box;
+    // Keep clicks on the subtitle from reaching the page/player (e.g. YouTube play/pause).
+    for (const type of ['click', 'mousedown', 'mouseup', 'pointerup'] as const) {
+      box.addEventListener(type, (e) => e.stopPropagation());
+    }
+    box.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      e.stopPropagation();
+      try {
+        box.setPointerCapture(e.pointerId);
+      } catch {
+        /* jsdom / detached */
+      }
+      this.drag = {
+        pointerId: e.pointerId,
+        startY: e.clientY,
+        startBottom: box.getBoundingClientRect().bottom,
+        offset: null,
+      };
+    });
+    box.addEventListener('pointermove', (e) => {
+      const d = this.drag;
+      if (!d || e.pointerId !== d.pointerId) return;
+      const dy = e.clientY - d.startY;
+      if (d.offset === null && Math.abs(dy) < DRAG_THRESHOLD_PX) return;
+      box.classList.add('dragging');
+      const rect = this.host.getBoundingClientRect();
+      d.offset = bottomOffsetFromDrag(rect.top, rect.height, d.startBottom + dy);
+      this.host.style.setProperty('--ys-bottom', `${d.offset}%`);
+    });
+    const end = (e: PointerEvent): void => {
+      const d = this.drag;
+      if (!d || e.pointerId !== d.pointerId) return;
+      this.drag = null;
+      box.classList.remove('dragging');
+      if (d.offset !== null && d.offset !== this.settings.bottomOffset) this.commitOffset(d.offset);
+    };
+    box.addEventListener('pointerup', end);
+    box.addEventListener('pointercancel', end);
+    box.addEventListener('dblclick', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      this.commitOffset(DEFAULT_SETTINGS.bottomOffset);
+    });
+  }
+
+  private commitOffset(offset: number): void {
+    this.settings = { ...this.settings, bottomOffset: offset };
+    this.applySettings();
+    this.onReposition(offset);
   }
 
   private applySettings(): void {

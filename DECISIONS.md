@@ -61,3 +61,6 @@ Decisions taken during development (append below, one line each: decision — re
 - Probe from the extension service worker (Playwright Chromium): both `translate.googleapis.com` (gtx) and `clients5.google.com` return HTTP 200 — the 429 seen with curl is client-specific; the fallback stays as a safety net.
 - YouTube: `YT_ENABLE_CC` is skipped while an ad is showing and re-sent when the ad ends; a `noPlayer`/`noTracks` result triggers one more attempt after 10 s.
 - Real-YouTube smoke test (`e2e/youtube.spec.ts`, gated by `E2E_YOUTUBE=1`): YouTube refuses playback in automated Chromium (headless and headed), so only the player-API caption selection could be verified live (tracklist read, manual EN chosen); interception/overlay on YouTube remain covered by unit tests + manual testing.
+
+## v0.2
+- Drag-to-reposition reuses `bottomOffset` (vertical only, box stays centered) so the popup slider and drag stay in sync; max raised 40 → 85 % so the subtitle can sit near the top. Clicks on the subtitle are stopped from reaching the page (no accidental YouTube play/pause).
