@@ -16,54 +16,52 @@ describe('LiveCaptionView', () => {
     now = 0;
     document.body.innerHTML = '';
   });
-  afterEach(() => vi.useRealTimers());
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
   const make = () => new LiveCaptionView(settings, document, () => now);
 
-  it('mounts as a floating bar without a video and shows interim → final → translation', () => {
+  it('mounts as a floating bar and shows only final, translated captions', () => {
     const v = make();
     v.handle(cap(1, 'So in college', false));
-    expect(v.overlay.host.style.position).toBe('fixed');
-    expect(v.overlay.displayedText).toBe('So in college');
-    expect(v.overlay.shadow.querySelector('.tr')?.classList.contains('pending')).toBe(true);
-    v.handle(cap(1, 'So in college I was a major.', true));
-    expect(v.overlay.displayedText).toBe('So in college I was a major.');
+    expect(v.overlay.displayedText).toBe(''); // interim English is never shown
     v.handle(cap(1, 'So in college I was a major.', true, 'Üniversitede bölümdüm.'));
+    expect(v.overlay.host.style.position).toBe('fixed');
     expect(v.overlay.displayedText).toBe('Üniversitede bölümdüm.\nSo in college I was a major.');
     v.destroy();
   });
 
-  it('keeps a translated sentence readable before the next interim replaces it', () => {
+  it('shows English dimmed only when translation failed', () => {
     const v = make();
-    v.handle(cap(1, 'Hello there.', true, 'Merhaba.'));
-    now = 300;
-    v.handle(cap(2, 'Next', false));
-    expect(v.overlay.displayedText).toContain('Merhaba.');
-    now = 1300;
-    vi.advanceTimersByTime(1000);
-    expect(v.overlay.displayedText).toBe('Next');
+    v.handle(cap(1, 'Untranslated.', true));
+    expect(v.overlay.displayedText).toBe('Untranslated.');
+    expect(v.overlay.shadow.querySelector('.tr')?.classList.contains('pending')).toBe(true);
     v.destroy();
   });
 
-  it('shows a late translation of the previous sentence over the next interim', () => {
+  it('newest sentence wins; an older one arriving late is dropped', () => {
     const v = make();
-    v.handle(cap(1, 'First sentence.', true));
-    now = 5000;
-    v.handle(cap(2, 'Second', false));
-    expect(v.overlay.displayedText).toBe('Second');
-    v.handle(cap(1, 'First sentence.', true, 'İlk cümle.'));
-    expect(v.overlay.displayedText).toBe('İlk cümle.\nFirst sentence.');
-    v.handle(cap(0, 'Older.', true, 'Eski.')); // stale: ignored
-    expect(v.overlay.displayedText).toBe('İlk cümle.\nFirst sentence.');
+    v.handle(cap(2, 'Second.', true, 'İkinci.'));
+    v.handle(cap(1, 'First.', true, 'Birinci.'));
+    expect(v.overlay.displayedText).toBe('İkinci.\nSecond.');
+    v.handle(cap(3, 'Third.', true, 'Üçüncü.'));
+    expect(v.overlay.displayedText).toBe('Üçüncü.\nThird.');
     v.destroy();
   });
 
-  it('clears after the hold time, on discard and on LIVE_END', () => {
+  it('logs speech-end → screen latency', () => {
+    const v = make();
+    now = 2500;
+    v.handle({ ...cap(1, 'Hi.', true, 'Selam.'), endedAt: 1000, durationMs: 1800 });
+    expect(v.overlay.host.getAttribute('data-live-trace')).toContain('"lagMs":1500');
+    v.destroy();
+  });
+
+  it('clears after the hold time and on LIVE_END', () => {
     const v = make();
     v.handle(cap(1, 'Done.', true, 'Bitti.'));
     vi.advanceTimersByTime(holdMs('Bitti.') + 10);
-    expect(v.overlay.displayedText).toBe('');
-    v.handle(cap(2, 'uh', false));
-    v.handle({ type: 'LIVE_DISCARD', id: 2 });
     expect(v.overlay.displayedText).toBe('');
     v.handle(cap(3, 'Again.', true, 'Yine.'));
     v.handle({ type: 'LIVE_END' });

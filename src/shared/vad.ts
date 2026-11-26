@@ -10,14 +10,14 @@ export const VAD_DEFAULTS = {
   /** consecutive speech frames needed to open a segment (90 ms) */
   startFrames: 3,
   /** silence that closes a segment */
-  endSilenceMs: 600,
+  endSilenceMs: 400,
   /** audio kept before speech onset */
   preRollMs: 300,
   /** silence kept after speech end */
   tailMs: 200,
   /** hard limit; longer speech is cut at the quietest point of the last `cutSearchMs` */
-  maxSegmentMs: 8000,
-  cutSearchMs: 2000,
+  maxSegmentMs: 5000,
+  cutSearchMs: 1500,
   /** segments with less voiced audio are dropped (clicks, coughs) */
   minVoicedMs: 300,
   /** interim snapshot cadence while speaking */

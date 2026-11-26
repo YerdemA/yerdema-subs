@@ -6,6 +6,7 @@
 import { test, expect, chromium, type BrowserContext, type Route, type Worker } from '@playwright/test';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { rmSync } from 'node:fs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dist = path.join(root, 'dist');
@@ -25,7 +26,19 @@ async function fulfillGoogle(route: Route): Promise<void> {
   await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([segs, null, 'en']) });
 }
 
+/**
+ * A persistent profile keeps the previously registered service-worker script, so a rebuilt
+ * background.js would not run. Drop the registration (Database + ScriptCache) but keep
+ * CacheStorage, where the downloaded speech model lives.
+ */
+function dropServiceWorkerRegistration(): void {
+  for (const dir of ['Database', 'ScriptCache']) {
+    rmSync(path.join(profile, 'Default', 'Service Worker', dir), { recursive: true, force: true });
+  }
+}
+
 async function launch(extraArgs: string[] = []): Promise<{ context: BrowserContext; worker: Worker }> {
+  dropServiceWorkerRegistration();
   const context = await chromium.launchPersistentContext(profile, {
     channel: 'chromium',
     headless,
@@ -73,7 +86,6 @@ test('live translation shows Turkish captions for speech without subtitles', asy
     let state: { phase?: string; progress?: number; device?: string; error?: string } = {};
     while (Date.now() - t0 < 540_000) {
       state = await worker.evaluate(async () => (await chrome.storage.session.get('liveState')).liveState ?? {});
-      console.log(`  t+${Math.round((Date.now() - t0) / 1000)}s`, state.phase, state.progress ?? '');
       if (state.phase === 'listening' || state.phase === 'error') break;
       await new Promise((r) => setTimeout(r, 2000));
     }
@@ -86,16 +98,35 @@ test('live translation shows Turkish captions for speech without subtitles', asy
       const a = document.getElementById('audio') as HTMLAudioElement;
       a.currentTime = 0;
     });
+    const traces: Array<{ id: number; lagMs?: number; durationMs?: number; translated?: boolean; dropped?: boolean }> = [];
+
     const tr = page.locator('yerdema-subs-overlay .tr:not(.pending)');
     await expect(tr).toBeVisible({ timeout: 30_000 });
     const seen = new Set<string>();
-    const until = Date.now() + 25_000;
+    const until = Date.now() + 45_000;
     while (Date.now() < until) {
       const text = (await tr.textContent().catch(() => '')) ?? '';
       if (text.trim()) seen.add(text.trim());
       await new Promise((r) => setTimeout(r, 300));
     }
     console.log('captions:\n' + [...seen].join('\n'));
+    traces.push(...JSON.parse((await page.locator('yerdema-subs-overlay').getAttribute('data-live-trace')) ?? '[]'));
+    const shown = traces.filter((t) => !t.dropped && t.lagMs !== undefined);
+    const lags = shown.map((t) => t.lagMs!).sort((a, b) => a - b);
+    const pct = (p: number): number => lags[Math.min(lags.length - 1, Math.floor(lags.length * p))] ?? NaN;
+    const stats = {
+      sentences: shown.length,
+      translated: shown.filter((t) => t.translated).length,
+      dropped: traces.filter((t) => t.dropped).length,
+      avgDurationMs: Math.round(shown.reduce((a, t) => a + (t.durationMs ?? 0), 0) / Math.max(1, shown.length)),
+      lagMedianMs: pct(0.5),
+      lagP90Ms: pct(0.9),
+      lagMaxMs: lags.at(-1),
+    };
+    console.log('latency (speech end → Turkish on screen):', JSON.stringify(stats));
+    expect(stats.sentences).toBeGreaterThan(3);
+    expect(stats.translated).toBe(stats.sentences);
+    expect(stats.lagP90Ms).toBeLessThan(2500);
     const all = [...seen].join(' ').toLowerCase();
     if (!realTranslate) {
       expect([...seen].every((s) => s.startsWith('[TR] '))).toBe(true);

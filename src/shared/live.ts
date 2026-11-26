@@ -29,12 +29,30 @@ export type OffscreenMessage =
 // offscreen → background
 export type LiveReportMessage =
   | { type: 'LIVE_STATUS'; state: Omit<LiveState, 'tabId'> }
-  | { type: 'LIVE_TEXT'; id: number; text: string; final: boolean }
+  | {
+      type: 'LIVE_TEXT';
+      id: number;
+      text: string;
+      final: boolean;
+      /** wall-clock ms when the speech segment ended (latency measurement) */
+      endedAt?: number;
+      /** segment length in ms */
+      durationMs?: number;
+    }
   | { type: 'LIVE_DISCARD'; id: number };
 
 // background → content (top frame of the captured tab)
 export type LiveCaptionMessage =
-  | { type: 'LIVE_CAPTION'; id: number; original: string; translation?: string; final: boolean }
+  | {
+      type: 'LIVE_CAPTION';
+      id: number;
+      original: string;
+      /** missing only when translation failed (English shown as a fallback) */
+      translation?: string;
+      final: boolean;
+      endedAt?: number;
+      durationMs?: number;
+    }
   | { type: 'LIVE_DISCARD'; id: number }
   | { type: 'LIVE_END' };
 
@@ -108,9 +126,4 @@ export function cleanTranscript(text: string): string {
 /** How long a finished caption stays on screen if nothing replaces it (ms). */
 export function holdMs(text: string): number {
   return Math.min(8000, Math.max(3000, 1500 + text.length * 60));
-}
-
-/** Minimum reading time before an interim of the next phrase may replace a final (ms). */
-export function minReadMs(text: string): number {
-  return Math.min(4000, Math.max(1200, text.length * 45));
 }

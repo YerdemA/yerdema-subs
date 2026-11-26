@@ -128,15 +128,21 @@ async function onReport(message: LiveReportMessage, translate: Translate): Promi
     toTab(tabId, { type: 'LIVE_DISCARD', id: message.id });
     return;
   }
-  toTab(tabId, { type: 'LIVE_CAPTION', id: message.id, original: message.text, final: message.final });
   if (!message.final) return;
   const res = await translate([message.text]).catch(
     (): TranslateResponse => ({ ok: false, error: 'translate failed' }),
   );
-  const translation = res.ok ? res.translations[0]?.trim() : undefined;
-  if (translation) {
-    toTab(tabId, { type: 'LIVE_CAPTION', id: message.id, original: message.text, translation, final: true });
-  }
+  const translation = res.ok ? res.translations[0]?.trim() || undefined : undefined;
+  // Only translated text is shown; English is sent alone only when translation failed.
+  toTab(tabId, {
+    type: 'LIVE_CAPTION',
+    id: message.id,
+    original: message.text,
+    final: true,
+    ...(translation ? { translation } : {}),
+    ...(message.endedAt !== undefined ? { endedAt: message.endedAt } : {}),
+    ...(message.durationMs !== undefined ? { durationMs: message.durationMs } : {}),
+  });
 }
 
 export function registerLive(translate: Translate): void {

@@ -1,14 +1,18 @@
 // Shows live (speech-to-text) captions in the page: over the largest visible video when there
-// is one, otherwise as a floating bar. Decides what to show when interim English text, final
-// text and late translations arrive in different orders.
-import { holdMs, minReadMs, type LiveCaptionMessage } from '../shared/live';
+// is one, otherwise as a floating bar. Only translated sentences are shown (English alone
+// appears only when translation failed, in the dimmed "pending" style), newest wins.
+import { holdMs, type LiveCaptionMessage } from '../shared/live';
 import type { CurrentSubtitle, Settings } from '../shared/types';
 import { Overlay } from './overlay';
 
 type Caption = Extract<LiveCaptionMessage, { type: 'LIVE_CAPTION' }>;
 
-/** Interim captions are cleared after this long without an update (speech stopped abruptly). */
-const INTERIM_TIMEOUT_MS = 10000;
+/**
+ * Latency trace (last entries) kept as a JSON attribute on the overlay host, readable from the
+ * page/tests: content-script console output and event details do not reliably cross worlds.
+ */
+export const TRACE_ATTR = 'data-live-trace';
+const TRACE_MAX = 100;
 
 export function pickLiveTarget(doc: Document): HTMLVideoElement | null {
   let best: HTMLVideoElement | null = null;
@@ -32,12 +36,7 @@ export class LiveCaptionView {
   readonly overlay: Overlay;
   private target: HTMLVideoElement | 'floating' | null = null;
   private shownId = 0;
-  private shownFinal = false;
-  private shownAt = 0;
-  private shownText = '';
   private clearTimer: ReturnType<typeof setTimeout> | undefined;
-  private deferTimer: ReturnType<typeof setTimeout> | undefined;
-  private deferred: Caption | null = null;
 
   constructor(
     settings: Settings,
@@ -58,12 +57,15 @@ export class LiveCaptionView {
   handle(msg: LiveCaptionMessage): void {
     switch (msg.type) {
       case 'LIVE_CAPTION':
-        if (msg.final) this.onFinal(msg);
-        else this.onInterim(msg);
+        // Interim (partial) text is never shown; an older sentence never replaces a newer one.
+        if (!msg.final) return;
+        if (msg.id < this.shownId) {
+          this.trace({ id: msg.id, dropped: true });
+          return;
+        }
+        this.display(msg);
         break;
       case 'LIVE_DISCARD':
-        if (msg.id === this.shownId && !this.shownFinal) this.clear();
-        if (this.deferred?.id === msg.id) this.deferred = null;
         break;
       case 'LIVE_END':
         this.clear();
@@ -71,45 +73,29 @@ export class LiveCaptionView {
     }
   }
 
-  private onInterim(msg: Caption): void {
-    if (msg.id < this.shownId || (msg.id === this.shownId && this.shownFinal)) return;
-    if (msg.id > this.shownId && this.shownFinal) {
-      // Let the previous sentence be read before the next one's English replaces it.
-      const wait = minReadMs(this.shownText) - (this.now() - this.shownAt);
-      if (wait > 0) {
-        this.deferred = msg;
-        if (this.deferTimer === undefined) {
-          this.deferTimer = setTimeout(() => {
-            this.deferTimer = undefined;
-            const d = this.deferred;
-            this.deferred = null;
-            if (d) this.onInterim(d);
-          }, wait);
-        }
-        return;
-      }
-    }
-    this.display(msg, false, INTERIM_TIMEOUT_MS);
-  }
-
-  private onFinal(msg: Caption): void {
-    // A late translation of an earlier sentence beats the next sentence's English interim.
-    const lateButUseful = msg.id < this.shownId && !this.shownFinal && !!msg.translation;
-    if (msg.id < this.shownId && !lateButUseful) return;
-    if (this.deferred && this.deferred.id <= msg.id) this.deferred = null;
-    const text = msg.translation ?? msg.original;
-    this.display(msg, true, holdMs(text));
-    this.shownAt = this.now();
-    this.shownText = text;
-  }
-
-  private display(msg: Caption, final: boolean, timeoutMs: number): void {
+  private display(msg: Caption): void {
     this.ensureMounted();
     this.shownId = msg.id;
-    this.shownFinal = final;
     this.overlay.show({ original: msg.original, translation: msg.translation });
     if (this.clearTimer !== undefined) clearTimeout(this.clearTimer);
-    this.clearTimer = setTimeout(() => this.clear(), timeoutMs);
+    this.clearTimer = setTimeout(() => this.clear(), holdMs(msg.translation ?? msg.original));
+    if (msg.endedAt !== undefined) {
+      // Latency trace (read by the live E2E test): speech end → caption on screen.
+      this.trace({
+        id: msg.id,
+        lagMs: this.now() - msg.endedAt,
+        durationMs: msg.durationMs,
+        translated: msg.translation !== undefined,
+      });
+    }
+  }
+
+  private readonly traces: Array<Record<string, unknown>> = [];
+
+  private trace(data: Record<string, unknown>): void {
+    this.traces.push(data);
+    if (this.traces.length > TRACE_MAX) this.traces.shift();
+    this.overlay.host.setAttribute(TRACE_ATTR, JSON.stringify(this.traces));
   }
 
   private ensureMounted(): void {
@@ -125,14 +111,10 @@ export class LiveCaptionView {
     if (this.clearTimer !== undefined) clearTimeout(this.clearTimer);
     this.clearTimer = undefined;
     this.overlay.show(null);
-    this.shownFinal = true;
-    this.shownText = '';
-    this.shownAt = 0;
   }
 
   destroy(): void {
     if (this.clearTimer !== undefined) clearTimeout(this.clearTimer);
-    if (this.deferTimer !== undefined) clearTimeout(this.deferTimer);
     this.overlay.destroy();
   }
 }

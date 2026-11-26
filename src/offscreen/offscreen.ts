@@ -10,7 +10,11 @@ interface Job {
   id: number;
   final: boolean;
   audio: Float32Array;
+  endedAt: number;
 }
+
+/** Segment end times / lengths by id, reported with the transcript for latency tracking. */
+const timing = new Map<number, { endedAt: number; durationMs: number }>();
 
 let worker: Worker | null = null;
 let stream: MediaStream | null = null;
@@ -56,8 +60,13 @@ function onWorker(msg: WorkerResponse): void {
     case 'result': {
       busy = false;
       const text = cleanTranscript(msg.text);
-      if (msg.final) report(text ? { type: 'LIVE_TEXT', id: msg.id, text, final: true } : { type: 'LIVE_DISCARD', id: msg.id });
-      else if (text && msg.id > lastFinalId) report({ type: 'LIVE_TEXT', id: msg.id, text, final: false });
+      const tm = timing.get(msg.id);
+      timing.delete(msg.id);
+      if (msg.final) {
+        report(text ? { type: 'LIVE_TEXT', id: msg.id, text, final: true, ...tm } : { type: 'LIVE_DISCARD', id: msg.id });
+      } else if (text && msg.id > lastFinalId) {
+        report({ type: 'LIVE_TEXT', id: msg.id, text, final: false });
+      }
       pump();
       return;
     }
@@ -89,10 +98,12 @@ function onSegments(events: SegmentEvent[]): void {
     if (ev.kind === 'final') {
       lastFinalId = Math.max(lastFinalId, ev.id);
       if (interim && interim.id <= ev.id) interim = null;
-      finals.push({ id: ev.id, final: true, audio: ev.audio });
+      const endedAt = Date.now();
+      timing.set(ev.id, { endedAt, durationMs: Math.round((ev.audio.length / 16000) * 1000) });
+      finals.push({ id: ev.id, final: true, audio: ev.audio, endedAt });
     } else if (ev.kind === 'interim') {
-      // Interims are only useful when the worker keeps up; never queue more than one.
-      if (finals.length === 0) interim = { id: ev.id, final: false, audio: ev.audio };
+      // Interim (partial) transcripts are not shown: an English line that is later replaced by
+      // Turkish confused users, and skipping them keeps the GPU free for final segments.
     } else {
       if (interim?.id === ev.id) interim = null;
       report({ type: 'LIVE_DISCARD', id: ev.id });
