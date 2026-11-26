@@ -35,8 +35,9 @@ Source priority (user's design), per page:
    universal fallback with ~1–3 s lag; DRM sites may block capture.
 
 Plan:
-- Spike: run Whisper (base/small) and Moonshine (tiny/base) via transformers.js + WebGPU on the
-  1650 Ti; measure speed (× real-time), accuracy and memory. Pick the model.
+- ~~Spike~~ **done** (`spike/stt/RESULTS.md`): moonshine-base on WebGPU, ~0.7 s per 5 s of
+  audio, ~10 % WER on clean speech; WASM fallback ~1.3 s. whisper-small.en optional for files.
+- Segment audio with a VAD (cut at pauses) instead of fixed chunks.
 - Shared STT engine in an offscreen document (model loaded once, one-time download cached).
 - Tier 3 (live) next: it makes "works everywhere" true. Then tier 2 as the quality/latency
   upgrade where a file URL exists.

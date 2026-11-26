@@ -1,0 +1,87 @@
+{
+  "gpu": {
+    "webgpu": true,
+    "vendor": "nvidia",
+    "architecture": "turing",
+    "description": "",
+    "f16": true
+  },
+  "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/159.0.0.0 Safari/537.36",
+  "runs": [
+    {
+      "id": "onnx-community/moonshine-tiny-ONNX",
+      "device": "webgpu",
+      "dtype": "mixed",
+      "loadMs": 41589,
+      "jfkMs": 726,
+      "jfkText": "And so my fellow Americans ask not what your country can do for you ask what you can do for your country",
+      "jfkWer": 0,
+      "chunk5sAvgMs": 572,
+      "chunk5sP90Ms": 837,
+      "chunkedText": "So in college I was a government major. Which means I had to write a lot of papers. Now, when a normal student writes a paper, they might spread the work out of it. Like this. So you know? You get started, maybe a little slowly, but you get enough done in the first week that with some heavier days later on, Everything gets done and things taste civil. And I would want to do that. Yeah, like that. That would be the plan. I would have it already to go, but... Then then the the people would come along and then I would kind of do this. And that would happen every single paper, but then. It came my 90-page senior thesis. A paper is supposed to spend a year on it. On, I knew for a paper like that, my normal work flow was not an option. It was way too. Big a project. So I plan things out and I decided I kind of had to go something like this. This is how the year we got. So I'd start off light and I bumped it up.",
+      "fileMs": 6574,
+      "fileRtf": 9.1,
+      "fileText": "So in college I was a government major, which means I had to write a lot of papers. Now, when a normal student writes a paper, they might spread the work out of the. Like this, so you know you get started. Maybe a little slowly, but you get enough done in the first week that with some heavier days later on. Everything gets done and things taste civil. And I would want to do that like that. That would be the plan. I would have it all ready to go. Then then that actually the paper would come along and then I would kind of do this, and that would happen every single paper, but. One came my 90-page senior thesis. A paper you're supposed to spend a year on. I knew for a paper like that, my normal work flow was not an option. It was way too much. Big a project, so I plan things out and I decided I kind of had to go something like this. This is how the year we go, so I'd start off light and I bump it."
+    },
+    {
+      "id": "onnx-community/moonshine-base-ONNX",
+      "device": "webgpu",
+      "dtype": "mixed",
+      "loadMs": 71904,
+      "jfkMs": 837,
+      "jfkText": "And so my fellow Americans ask not what your country can do for you ask what you can do for your country",
+      "jfkWer": 0,
+      "chunk5sAvgMs": 714,
+      "chunk5sP90Ms": 959,
+      "chunkedText": "So in college, I was a government major. Which means I had to write a lot of papers. Now, when a normal student writes a paper, they might spread the work out a little bit Like this so you know you You get started, maybe a little slowly, but you get enough done in the first week that with some heavier days later on, Everything gets done and things stay civil. And I would want to do this. That would be the plan. I would have it all ready to go. But then actually the people would come along and then I would kind of do this. And that would happen every single paper, but then. And came my 90-page senior thesis. A paper you're supposed to spend a year on. On anew for a paper like that, my normal work flow was not an option. It was way too. Take a project. So I planned things out and I decided it kind of had to go something like this. This is how the year would go. So I'd start off light and I'd bump it in.",
+      "fileMs": 8192,
+      "fileRtf": 7.3,
+      "fileText": "So in college, I was a government major, which means I had to write a lot of papers. Now, when a normal student writes a paper, they might spread the work out of the book. Like this, so you know you get started, maybe a little slowly, but you get enough done in the first week that with some heavier days later on. Everything gets done, things stay civil. And I would want to do that, like that. That would be the plan. I would have it all ready to go. But then the people would come along and then I would kind of do this. And that would happen to every single paper. But then, came my 90 page senior thesis. A paper you're supposed to spend a year on. I knew for a paper like that my normal workflow was not an option. It was way too a project. So I planned things out and I decided I kind of had to go something like this. This is how the year would go. So I'd start off light and I'd bump it"
+    },
+    {
+      "id": "onnx-community/whisper-base.en",
+      "device": "webgpu",
+      "dtype": "mixed",
+      "loadMs": 100180,
+      "jfkMs": 962,
+      "jfkText": "And so my fellow Americans ask not what your country can do for you ask what you can do for your country.",
+      "jfkWer": 0,
+      "chunk5sAvgMs": 810,
+      "chunk5sP90Ms": 1020,
+      "chunkedText": "So in college, I was a government major. means I had to write a lot of papers. Now, when a normal student writes a paper, they might spread the work out a little like this. So you know. get started maybe a little slowly. You get enough done in the first week that with some heavier days later on. Everything gets done, things taste civil. And I would want to do that. that But then, actually, the paper would come along, and then I would kind of do this. And that would happen every single paper. came my 90 page senior thesis. The paper you're supposed to spend a year on. I knew for a paper like that my normal workflow was not an option it was way too big a project. So I planned things out and I decided it kind of had to go something like this. This is how the year we got. So I start off light and I bump it",
+      "fileMs": 7215,
+      "fileRtf": 8.3,
+      "fileText": "So in college, I was a government major, which means I had to write a lot of papers. Now, when a normal student writes a paper, they might spread the work out a little like this. So, you know, you get started maybe a little slowly, but you get enough done in the first week that with some heavier days later on, everything gets done, things taste civil. And I would wanna do that like that. That would be the plan. I would have it all ready to go. But then, actually, the paper would come along, and then I would kind of do this. And that would happen every single paper. But then came my 90-page senior thesis. A paper you're supposed to spend a year on. I knew for a paper like that, my normal workflow was not an option. It was way too big a project. So I planned things out and I decided it kind of had to go something like this. This is how the year we go. So I'd start off light and I'd bump it"
+    },
+    {
+      "id": "onnx-community/whisper-small.en",
+      "device": "webgpu",
+      "dtype": "mixed",
+      "loadMs": 246455,
+      "jfkMs": 1896,
+      "jfkText": "And so, my fellow Americans, ask not what your country can do for you. Ask what you can do for your country.",
+      "jfkWer": 0,
+      "chunk5sAvgMs": 1605,
+      "chunk5sP90Ms": 1879,
+      "chunkedText": "So in college, I was a government major. which means I had to write a lot of papers. Now, when a normal student writes a paper, they might spread the work out a little bit. like this. You get started maybe a little slowly, but you get enough done in the first week that, with some heavier days later on, Everything gets done, things stay civil. And I would want to do that. like that. That would be the plan. I would have it all ready to go. But then actually the paper would come along and then I would kind of do this. And that would happen every single paper. Then came my 90 page senior thesis. A paper you're supposed to spend a year on. I knew for a paper like that my normal workflow was not an option. It was way too big bigger project. So I planned things out and I decided I kind of had to go something like this. This is how the year would go. So I'd start off light and I'd bump it up and down.",
+      "fileMs": 15035,
+      "fileRtf": 4,
+      "fileText": "So in college, I was a government major, which means I had to write a lot of papers. Now, when a normal student writes a paper, they might spread the work out a little like this. So you know. You get started maybe a little slowly, but you get enough done in the first week that with some heavier days later on, everything gets done and things stay civil. And I would want to do that like that. That would be the plan. I would have it all ready to go, but then actually the paper would come along, and then I would kind of do this. And that would happen every single paper. But then came my 90-page senior thesis, a paper you're supposed to spend a year on. I knew for a paper like that, my normal workflow was not an option, it was way too big a project. So I planned things out and I decided I kind of had to go something like this. This is how the year would go. So I'd start off light and I'd bump it up and I'd start off with a new paper."
+    },
+    {
+      "id": "onnx-community/moonshine-base-ONNX",
+      "device": "wasm",
+      "dtype": "q8",
+      "loadMs": 31389,
+      "jfkMs": 2879,
+      "jfkText": "And so my fellow Americans ask not what your country can do for you ask what you can do for your country",
+      "jfkWer": 0,
+      "chunk5sAvgMs": 1277,
+      "chunk5sP90Ms": 1608,
+      "chunkedText": "So in college, I was a government major. Which means I had to write a lot of papers. Now, when a normal student writes a paper, they might spread the work out a little bit Like this so you know you You get started, maybe a little slowly, but you get enough done in the first week that with some heavier days later on, Everything gets done and things stay civil. And I would want to do this. That would be the plan. I would have it all ready to go. But then, actually, the people would come along, and then I would kind of do this.  And came my 90-page senior thesis. A paper you're supposed to spend a year on. On a new for a paper like that, my normal work flow was not an option. It was way too. a project. So I planned things out and I decided it kind of had to go something like this. This is how the year would go. So I'd start off light and I'd bump it in.",
+      "fileMs": 16230,
+      "fileRtf": 3.7,
+      "fileText": "So in college, I was a government major, which means I had to write a lot of papers. Now, when a normal student writes a paper, they might spread the work out a little bit. Like this, so you know you get started. Maybe a little slowly, but you get enough done in the first week that with some heavier days later on. Everything gets done and things stay civil. And I would want to do that like that. That would be the plan. I would have it all ready to go. But then the paper would come along and then I would kind of do this. And that would happen every single paper. But then, One came my 90-page senior thesis. A paper you're supposed to spend a year on. I knew for a paper like that, my normal workflow was not an option. It was way too bad. a project. So I planned things out and I decided I kind of had to go something like this. This is how the year would go. So I'd start off light and I'd bump it"
+    }
+  ]
+}

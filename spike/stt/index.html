@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>STT spike</title>
+<style>body{font:14px system-ui;margin:16px;background:#111;color:#eee}pre{white-space:pre-wrap}</style>
+</head>
+<body>
+<h1>STT spike</h1>
+<pre id="log"></pre>
+<script type="module">
+// Benchmarks local speech-to-text models in the browser (transformers.js + WebGPU / WASM).
+// Query: ?models=id1|device|dtype,id2|...  Results are posted to window.__done(result).
+import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.2';
+
+const logEl = document.getElementById('log');
+const log = (...a) => { const s = a.join(' '); logEl.textContent += s + '\n'; console.log('[spike]', s); };
+const AUDIO = 'https://huggingface.co/datasets/Xenova/transformers.js-docs/resolve/main/';
+const JFK_REF = 'and so my fellow americans ask not what your country can do for you ask what you can do for your country';
+
+async function load16k(name) {
+  const buf = await (await fetch(AUDIO + name)).arrayBuffer();
+  const ctx = new OfflineAudioContext(1, 1, 16000);
+  const audio = await ctx.decodeAudioData(buf);
+  return audio.getChannelData(0).slice();
+}
+
+const norm = (t) => t.toLowerCase().replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim();
+function wer(ref, hyp) {
+  const r = norm(ref).split(' '), h = norm(hyp).split(' ');
+  const d = Array.from({ length: r.length + 1 }, (_, i) => [i, ...Array(h.length).fill(0)]);
+  for (let j = 1; j <= h.length; j++) d[0][j] = j;
+  for (let i = 1; i <= r.length; i++)
+    for (let j = 1; j <= h.length; j++)
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (r[i - 1] === h[j - 1] ? 0 : 1));
+  return d[r.length][h.length] / r.length;
+}
+
+async function gpuInfo() {
+  if (!navigator.gpu) return { webgpu: false };
+  const a = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
+  if (!a) return { webgpu: false };
+  const info = a.info ?? {};
+  return { webgpu: true, vendor: info.vendor, architecture: info.architecture, description: info.description, f16: a.features.has('shader-f16') };
+}
+
+async function bench(spec, jfk, ted) {
+  const [id, device, dtypeName] = spec.split('|');
+  const dtype = dtypeName === 'mixed' ? { encoder_model: 'fp32', decoder_model_merged: 'q4' } : dtypeName;
+  const r = { id, device, dtype: dtypeName };
+  try {
+    let t0 = performance.now();
+    const asr = await pipeline('automatic-speech-recognition', id, { device, dtype });
+    r.loadMs = Math.round(performance.now() - t0);
+    await asr(jfk.subarray(0, 16000 * 2)); // warm-up (shader compilation)
+
+    t0 = performance.now();
+    const j = await asr(jfk);
+    r.jfkMs = Math.round(performance.now() - t0);
+    r.jfkText = j.text.trim();
+    r.jfkWer = +wer(JFK_REF, r.jfkText).toFixed(3);
+
+    // Live-style: independent 5 s chunks.
+    const chunk = 16000 * 5, lat = [], parts = [];
+    for (let off = 0; off + chunk <= ted.length; off += chunk) {
+      t0 = performance.now();
+      const o = await asr(ted.subarray(off, off + chunk));
+      lat.push(performance.now() - t0);
+      parts.push(o.text.trim());
+    }
+    lat.sort((a, b) => a - b);
+    r.chunk5sAvgMs = Math.round(lat.reduce((a, b) => a + b, 0) / lat.length);
+    r.chunk5sP90Ms = Math.round(lat[Math.floor(lat.length * 0.9)]);
+    r.chunkedText = parts.join(' ');
+
+    // File-style: whole 60 s (Whisper: 30 s windows; Moonshine: 10 s pieces).
+    t0 = performance.now();
+    let full;
+    if (id.includes('whisper')) full = (await asr(ted, { chunk_length_s: 30, stride_length_s: 5 })).text;
+    else {
+      const out = [];
+      for (let off = 0; off < ted.length; off += 16000 * 10) out.push((await asr(ted.subarray(off, off + 16000 * 10))).text.trim());
+      full = out.join(' ');
+    }
+    r.fileMs = Math.round(performance.now() - t0);
+    r.fileRtf = +(ted.length / 16000 / (r.fileMs / 1000)).toFixed(1); // × real-time
+    r.fileText = full.trim();
+    await asr.dispose?.();
+  } catch (e) {
+    r.error = String(e?.stack ?? e).slice(0, 600);
+  }
+  log(JSON.stringify(r));
+  return r;
+}
+
+(async () => {
+  const specs = (new URLSearchParams(location.search).get('models') ?? '').split(',').filter(Boolean);
+  const result = { gpu: await gpuInfo(), ua: navigator.userAgent, runs: [] };
+  log('GPU', JSON.stringify(result.gpu));
+  const [jfk, ted] = await Promise.all([load16k('jfk.wav'), load16k('ted_60_16k.wav')]);
+  log(`audio: jfk ${(jfk.length / 16000).toFixed(1)} s, ted ${(ted.length / 16000).toFixed(1)} s`);
+  for (const s of specs) { log('== ' + s); result.runs.push(await bench(s, jfk, ted)); }
+  window.__done?.(result);
+})().catch((e) => { log('FATAL ' + e); window.__done?.({ fatal: String(e) }); });
+</script>
+</body>
+</html>

@@ -8,3 +8,4 @@ playwright-report/
 .DS_Store
 Thumbs.db
 .claude/settings.local.json
+spike/stt/.profile/
