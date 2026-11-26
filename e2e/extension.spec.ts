@@ -15,7 +15,8 @@ const ENGLISH_CUES = [
   'This flower is beautiful.',
   'The bees love it too.',
   'Look at the colors.',
-  'Spring is finally here.',
+  'Spring is',
+  'finally here.',
   "Nature is amazing, isn't it?",
   'Thank you for watching.',
   'See you next time!',
@@ -262,5 +263,27 @@ test('subtitle delay from the popup shifts cues for the current video only', asy
   await send(0);
   await expect(page.locator('yerdema-subs-overlay .wrap')).toBeVisible();
   expect(await video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
+  await page.close();
+});
+
+test('a sentence split across two cues is translated once and shown on both parts', async () => {
+  test.skip(realTranslate, 'checks the mocked translation text');
+  const page = await context.newPage();
+  await page.goto('http://localhost:5173/');
+  await page.evaluate(async () => {
+    const v = document.querySelector('video')!;
+    v.muted = true;
+    await v.play();
+  });
+  const tr = page.locator('yerdema-subs-overlay .tr:not(.pending)');
+  await expect(tr).toBeVisible({ timeout: 20_000 });
+  for (const t of [2.8, 3.1]) {
+    await page.evaluate((time) => {
+      const v = document.querySelector('video')!;
+      v.pause();
+      v.currentTime = time;
+    }, t);
+    await expect(tr).toHaveText('[TR] Spring is finally here.');
+  }
   await page.close();
 });

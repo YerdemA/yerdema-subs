@@ -229,6 +229,26 @@ describe('CueSync', () => {
 });
 
 describe('CueTranslator', () => {
+  it('translates a multi-cue sentence once and shows it on every part', async () => {
+    const list: Cue[] = [
+      { id: 0, start: 0, end: 1, text: 'I went to the store', sentence: 'I went to the store because I needed milk.' },
+      { id: 1, start: 1, end: 2, text: 'because I needed milk.', sentence: 'I went to the store because I needed milk.' },
+      { id: 2, start: 2, end: 3, text: 'It was closed.' },
+    ];
+    const requests: string[][] = [];
+    const send = async (texts: string[]) => {
+      requests.push(texts);
+      return { ok: true as const, translations: texts.map((t) => `TR ${t}`) };
+    };
+    const tr = new CueTranslator(send, () => 0, () => {});
+    tr.setCues(list);
+    await vi.waitFor(() => expect(tr.state).toBe('done'));
+    expect(requests.flat()).toEqual(['I went to the store because I needed milk.', 'It was closed.']);
+    expect(list[0]!.translation).toBe('TR I went to the store because I needed milk.');
+    expect(list[1]!.translation).toBe(list[0]!.translation);
+    expect(list[2]!.translation).toBe('TR It was closed.');
+  });
+
   it('translates in priority order with at most 2 requests in flight', async () => {
     const list: Cue[] = Array.from({ length: 200 }, (_, i) => ({ id: i, start: i * 2, end: i * 2 + 1.5, text: `cue ${i}` }));
     const requests: string[][] = [];

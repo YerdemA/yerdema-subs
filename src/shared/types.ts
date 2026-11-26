@@ -8,6 +8,9 @@ export interface Cue {
   end: number;
   /** single-line normalized English text */
   text: string;
+  /** full sentence when this cue is one part of a multi-cue sentence (translated as a whole) */
+  sentence?: string;
+  /** Turkish translation (of `sentence` when set, otherwise of `text`) */
   translation?: string;
 }
 

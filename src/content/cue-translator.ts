@@ -2,6 +2,7 @@
 // (current position first, then the rest), at most 2 requests in flight, and applies results.
 import { makeBatches } from '../shared/batching';
 import { prioritizeCueIndices } from '../shared/cues';
+import { translationUnit } from '../shared/sentences';
 import type { Cue, TranslateResponse } from '../shared/types';
 
 export type SendTranslate = (texts: string[], videoKey?: string) => Promise<TranslateResponse>;
@@ -65,14 +66,14 @@ export class CueTranslator {
   private pendingCount(): number {
     let n = 0;
     for (const c of this.cues) {
-      if (c.translation === undefined && !this.failed.has(c.text)) n++;
+      if (c.translation === undefined && !this.failed.has(translationUnit(c))) n++;
     }
     return n;
   }
 
   private applyKnown(): void {
     for (const c of this.cues) {
-      const tr = this.known.get(c.text);
+      const tr = this.known.get(translationUnit(c));
       if (tr !== undefined) c.translation = tr;
     }
   }
@@ -84,7 +85,7 @@ export class CueTranslator {
     for (const i of order) {
       const c = this.cues[i];
       if (!c || c.translation !== undefined) continue;
-      const t = c.text;
+      const t = translationUnit(c);
       if (seen.has(t) || this.inFlight.has(t) || this.failed.has(t) || this.known.has(t)) continue;
       seen.add(t);
       texts.push(t);
