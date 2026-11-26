@@ -1,8 +1,9 @@
-// Background service worker: translation requests + keyboard command.
+// Background service worker: translation requests, live transcription control, keyboard commands.
 // Listeners are registered synchronously at top level (MV3 requirement).
 import type { KeyValueStore } from '../shared/cache';
 import { loadSettings, saveSettings } from '../shared/settings';
 import { isRuntimeMessage, type TranslateResponse } from '../shared/types';
+import { registerLive, toggleLiveForActiveTab } from './live';
 import { TranslationService } from './service';
 import { GoogleGtxTranslator } from './translator';
 
@@ -26,7 +27,15 @@ chrome.runtime.onMessage.addListener((message: unknown, _sender, sendResponse) =
   return true; // async response
 });
 
+registerLive((texts) => service.handle(texts));
+// Test hook (E2E): start/stop live translation for the active tab without the popup.
+(globalThis as { yerdemaToggleLive?: () => Promise<void> }).yerdemaToggleLive = toggleLiveForActiveTab;
+
 chrome.commands.onCommand.addListener((command) => {
+  if (command === 'toggle-live') {
+    toggleLiveForActiveTab().catch(() => undefined);
+    return;
+  }
   if (command !== 'toggle-subs') return;
   void (async () => {
     try {

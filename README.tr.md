@@ -19,11 +19,19 @@
 - Kaymış altyazılar için video başına **zamanlama ayarı** (±0,5 sn adımlarla).
 - Birden fazla satıra bölünmüş **cümleler bütün olarak çevrilir**; Türkçe cümle tüm parçalar
   boyunca ekranda kalır.
+- **Altyazısı olmayan içerikler için canlı çeviri** (açılır pencere → "Canlı çeviri" ya da
+  **Alt+Shift+L**): sekmenin sesini yakalar, İngilizce konuşmayı **bilgisayarınızda** Moonshine
+  modeliyle yazıya döker (ekran kartı/WebGPU, yoksa işlemci), her cümleyi çevirip videonun
+  üzerinde ya da ekranın altında yüzen bir şerit olarak gösterir. Ses bilgisayarınızdan çıkmaz;
+  yalnızca tanınan metin çevrilir. İlk kullanımda konuşma modeli bir kez indirilir (~154 MB),
+  sonraki açılışlar birkaç saniye sürer.
 
 ## Sınırlamalar
 
-- **Var olan bir altyazı gerekir.** Altyazısı olmayan videolar desteklenmez (konuşmadan yazıya
-  çevirme yok).
+- Canlı çeviri konuşmanın ~1–1,5 sn gerisinden gelir; net konuşmada en iyi sonucu verir (müzik
+  ve gürültü doğruluğu düşürür), kopya korumalı (DRM) oynatıcılarda ses yakalanamayabilir. Aynı
+  anda tek sekme.
+- **Altyazı modu var olan bir altyazı gerektirir**; diğer içerikler için canlı çeviriyi kullanın.
 - Desteklenmeyenler: Netflix, Prime Video, Disney+, Twitch, canlı yayınlar, YouTube Shorts,
   başka sitelere gömülü YouTube videoları, altyazıyı düz DOM metni olarak çizen oynatıcılar
   (YouTube hariç), Firefox/Safari.

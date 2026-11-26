@@ -1,54 +1,189 @@
 {
-  "extName": { "message": "Yerdema Subs", "description": "Extension name" },
-  "extDescription": { "message": "Translates English video subtitles to Turkish in real time on YouTube and HTML5 videos." },
-  "cmdToggle": { "message": "Toggle Turkish subtitles on/off" },
-
-  "toggleLabel": { "message": "Turkish subtitles on/off" },
-  "statusTitle": { "message": "Status" },
-  "status_idle": { "message": "Waiting for subtitles…" },
-  "status_no_video": { "message": "No video found on this page." },
-  "status_no_subtitles": { "message": "This video has no usable subtitles." },
-  "status_translating": { "message": "Translating subtitles…" },
-  "status_active": { "message": "Turkish subtitles are active." },
-  "status_error": { "message": "Translation failed. English text is shown." },
-  "status_disabled": { "message": "Turned off." },
-  "status_unsupported": { "message": "This page isn't supported." },
-
-  "detail_turnOnCC": { "message": "Turn on CC (English) in the player." },
-  "detail_noTrack": { "message": "The video has no subtitle track." },
-  "detail_cors": { "message": "The subtitle file couldn't be read (cross-origin)." },
-  "detail_loading": { "message": "Loading the subtitle track…" },
-  "detail_notPlaying": { "message": "Start playing the video." },
-  "detail_ad": { "message": "An ad is playing." },
-  "detail_translateFailed": { "message": "Google Translate didn't respond; retrying shortly." },
-
-  "source_youtube_intercept": { "message": "Source: YouTube captions" },
-  "source_youtube_dom": { "message": "Source: YouTube on-screen captions" },
-  "source_html5": { "message": "Source: HTML5 video track" },
-
-  "labelMode": { "message": "Display" },
-  "modeTr": { "message": "TR" },
-  "modeTrEn": { "message": "TR + EN" },
-  "labelFontSize": { "message": "Font size" },
-  "labelDelay": { "message": "Timing" },
-  "delayEarlier": { "message": "Show subtitles 0.5 s earlier" },
-  "delayLater": { "message": "Show subtitles 0.5 s later" },
-  "delayReset": { "message": "Reset" },
-  "secondsUnit": { "message": "s" },
-  "labelPosition": { "message": "Position from bottom" },
-  "dragHint": { "message": "Tip: drag the subtitle on the video to move it; double-click resets." },
-  "labelBackground": { "message": "Background opacity" },
-  "labelHideOriginal": { "message": "Hide original subtitles" },
-  "labelPreview": { "message": "Preview" },
-  "previewTr": { "message": "Merhaba! Bu bir örnek altyazıdır." },
-  "previewEn": { "message": "Hello! This is a sample subtitle." },
-
-  "privacyNote": { "message": "Subtitle text is sent to Google Translate for translation." },
-  "shortcutHint": { "message": "Shortcut: $1 toggles subtitles" },
-  "shortcutNotSet": { "message": "Set a shortcut on the browser's extension shortcuts page." },
-
-  "labelDisableSite": { "message": "Disable on this site" },
-  "copySubtitle": { "message": "Copy current subtitle" },
-  "copied": { "message": "Copied!" },
-  "detail_siteDisabled": { "message": "Switched off on this site." }
+  "extName": {
+    "message": "Yerdema Subs",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "Translates English video subtitles to Turkish in real time on YouTube and HTML5 videos."
+  },
+  "cmdToggle": {
+    "message": "Toggle Turkish subtitles on/off"
+  },
+  "toggleLabel": {
+    "message": "Turkish subtitles on/off"
+  },
+  "statusTitle": {
+    "message": "Status"
+  },
+  "status_idle": {
+    "message": "Waiting for subtitles…"
+  },
+  "status_no_video": {
+    "message": "No video found on this page."
+  },
+  "status_no_subtitles": {
+    "message": "This video has no usable subtitles."
+  },
+  "status_translating": {
+    "message": "Translating subtitles…"
+  },
+  "status_active": {
+    "message": "Turkish subtitles are active."
+  },
+  "status_error": {
+    "message": "Translation failed. English text is shown."
+  },
+  "status_disabled": {
+    "message": "Turned off."
+  },
+  "status_unsupported": {
+    "message": "This page isn't supported."
+  },
+  "detail_turnOnCC": {
+    "message": "Turn on CC (English) in the player."
+  },
+  "detail_noTrack": {
+    "message": "The video has no subtitle track."
+  },
+  "detail_cors": {
+    "message": "The subtitle file couldn't be read (cross-origin)."
+  },
+  "detail_loading": {
+    "message": "Loading the subtitle track…"
+  },
+  "detail_notPlaying": {
+    "message": "Start playing the video."
+  },
+  "detail_ad": {
+    "message": "An ad is playing."
+  },
+  "detail_translateFailed": {
+    "message": "Google Translate didn't respond; retrying shortly."
+  },
+  "source_youtube_intercept": {
+    "message": "Source: YouTube captions"
+  },
+  "source_youtube_dom": {
+    "message": "Source: YouTube on-screen captions"
+  },
+  "source_html5": {
+    "message": "Source: HTML5 video track"
+  },
+  "labelMode": {
+    "message": "Display"
+  },
+  "modeTr": {
+    "message": "TR"
+  },
+  "modeTrEn": {
+    "message": "TR + EN"
+  },
+  "labelFontSize": {
+    "message": "Font size"
+  },
+  "labelDelay": {
+    "message": "Timing"
+  },
+  "delayEarlier": {
+    "message": "Show subtitles 0.5 s earlier"
+  },
+  "delayLater": {
+    "message": "Show subtitles 0.5 s later"
+  },
+  "delayReset": {
+    "message": "Reset"
+  },
+  "secondsUnit": {
+    "message": "s"
+  },
+  "labelPosition": {
+    "message": "Position from bottom"
+  },
+  "dragHint": {
+    "message": "Tip: drag the subtitle on the video to move it; double-click resets."
+  },
+  "labelBackground": {
+    "message": "Background opacity"
+  },
+  "labelHideOriginal": {
+    "message": "Hide original subtitles"
+  },
+  "labelPreview": {
+    "message": "Preview"
+  },
+  "previewTr": {
+    "message": "Merhaba! Bu bir örnek altyazıdır."
+  },
+  "previewEn": {
+    "message": "Hello! This is a sample subtitle."
+  },
+  "privacyNote": {
+    "message": "Subtitle text is sent to Google Translate for translation."
+  },
+  "shortcutHint": {
+    "message": "Shortcut: $1 toggles subtitles"
+  },
+  "shortcutNotSet": {
+    "message": "Set a shortcut on the browser's extension shortcuts page."
+  },
+  "labelDisableSite": {
+    "message": "Disable on this site"
+  },
+  "copySubtitle": {
+    "message": "Copy current subtitle"
+  },
+  "copied": {
+    "message": "Copied!"
+  },
+  "detail_siteDisabled": {
+    "message": "Switched off on this site."
+  },
+  "cmdToggleLive": {
+    "message": "Start/stop live translation of the tab audio"
+  },
+  "liveTitle": {
+    "message": "Live translation"
+  },
+  "liveHint": {
+    "message": "For content without subtitles: transcribes this tab's audio on your computer."
+  },
+  "liveStart": {
+    "message": "Start"
+  },
+  "liveStop": {
+    "message": "Stop"
+  },
+  "liveStarting": {
+    "message": "Starting…"
+  },
+  "liveLoading": {
+    "message": "Downloading speech model (one time)… $VALUE$%",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "liveListening": {
+    "message": "Listening ($VALUE$)",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "liveError": {
+    "message": "Error: $VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "liveOtherTab": {
+    "message": "Running in another tab"
+  },
+  "source_live": {
+    "message": "Source: live speech-to-text"
+  }
 }

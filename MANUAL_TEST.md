@@ -112,3 +112,15 @@ denemeleri HTTP 429 döndü, ama aynı istek eklentinin servis çalışanından 
 HTTP 200 döndü. Eklenti önce asıl adresi, 429 alırsa `clients5.google.com` yedek adresini
 dener. Altyazılar hiç Türkçeye dönmüyorsa Service worker konsolunda `HTTP 429` hatalarını
 kontrol edin ve not edin.
+
+## Canlı çeviri (altyazısız içerik)
+
+1. `npm run serve:test` → http://localhost:5173/live.html (altyazısız İngilizce TED konuşması).
+2. Açılır pencere → **Canlı çeviri → Başlat** (ya da Alt+Shift+L). İlk seferde "Konuşma modeli
+   indiriliyor… %x" görünür (~154 MB, bir kez), sonra "Dinleniyor (GPU)".
+3. Sesi oynatın: sekme sesi duyulmaya devam etmeli; ~1–2 sn içinde ekranın altında İngilizce
+   (italik) ardından Türkçe altyazı belirmeli.
+4. Altyazısız bir YouTube videosu / podcast sitesi deneyin: video varsa altyazı videonun
+   üzerinde, yoksa ekranın altında yüzer.
+5. **Durdur** (ya da Alt+Shift+L): altyazı kaybolur, normal altyazı modu geri gelir.
+6. Sekmeyi kapatınca canlı çeviri kendiliğinden durmalı.

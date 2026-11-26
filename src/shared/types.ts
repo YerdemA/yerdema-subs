@@ -39,7 +39,7 @@ export type Status =
   | 'error'
   | 'disabled';
 
-export type SubtitleSource = 'youtube-intercept' | 'youtube-dom' | 'html5';
+export type SubtitleSource = 'youtube-intercept' | 'youtube-dom' | 'html5' | 'live';
 
 export interface CurrentSubtitle {
   original: string;

@@ -38,6 +38,9 @@ Plan:
 - ~~Spike~~ **done** (`spike/stt/RESULTS.md`): moonshine-base on WebGPU, ~0.7 s per 5 s of
   audio, ~10 % WER on clean speech; WASM fallback ~1.3 s. whisper-small.en optional for files.
 - Segment audio with a VAD (cut at pauses) instead of fixed chunks.
+- **Tier 3 (live) implemented:** popup button / Alt+Shift+L, offscreen capture, energy VAD,
+  moonshine-base worker, translated captions over the video or as a floating bar. Cached start
+  ~6 s, first start ~70 s (model download). Next: tier 2 (audio file found on the page).
 - Shared STT engine in an offscreen document (model loaded once, one-time download cached).
 - Tier 3 (live) next: it makes "works everywhere" true. Then tier 2 as the quality/latency
   upgrade where a file URL exists.

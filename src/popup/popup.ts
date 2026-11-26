@@ -2,8 +2,9 @@
 import { localizeDocument, t } from '../shared/i18n';
 import { DEFAULT_SETTINGS, isSiteDisabled, loadSettings, normalizeSettings, saveSettings, subscribeSettings, withSite } from '../shared/settings';
 import { clampDelay, DELAY_STEP_SEC, formatDelay } from '../shared/delay';
+import { isLiveState, type LiveState } from '../shared/live';
 import { isRecord, type Settings, type StatusInfo } from '../shared/types';
-import { statusMessageKey, detailMessageKey, sourceMessageKey, formatCopyText, PREVIEW_SCALE } from './popup-logic';
+import { statusMessageKey, detailMessageKey, sourceMessageKey, formatCopyText, liveView, PREVIEW_SCALE } from './popup-logic';
 
 const $ = <T extends HTMLElement>(id: string): T => {
   const el = document.getElementById(id);
@@ -146,6 +147,55 @@ copyEl.addEventListener('click', () => {
   }).catch(() => undefined);
 });
 
+// --- live translation (speech-to-text of the tab audio) ---
+let liveState: LiveState | null = null;
+let activeTabId: number | undefined;
+const liveBtn = $<HTMLButtonElement>('live-btn');
+
+function renderLive(): void {
+  const view = liveView(liveState, activeTabId);
+  liveBtn.textContent = t(view.button);
+  liveBtn.dataset.on = String(view.on);
+  const el = $('live-status');
+  el.hidden = !view.status;
+  el.dataset.phase = liveState?.phase ?? 'off';
+  el.textContent = view.status ? t(view.status.key, view.status.arg) : '';
+}
+
+async function queryLive(): Promise<void> {
+  try {
+    const res: unknown = await chrome.runtime.sendMessage({ type: 'GET_LIVE_STATE' });
+    liveState = isLiveState(res) ? res : null;
+  } catch {
+    liveState = null;
+  }
+  renderLive();
+}
+
+liveBtn.addEventListener('click', () => {
+  void (async () => {
+    liveBtn.disabled = true;
+    try {
+      if (liveView(liveState, activeTabId).on) {
+        await chrome.runtime.sendMessage({ type: 'LIVE_STOP' });
+      } else {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (tab?.id === undefined) return;
+        // Must run here: opening the popup is the user gesture tab capture requires.
+        const streamId = await chrome.tabCapture.getMediaStreamId({ targetTabId: tab.id });
+        const res: unknown = await chrome.runtime.sendMessage({ type: 'LIVE_START', tabId: tab.id, streamId });
+        if (isLiveState(res)) liveState = res;
+      }
+    } catch (err) {
+      liveState = { phase: 'error', error: err instanceof Error ? err.message : String(err) };
+    } finally {
+      liveBtn.disabled = false;
+    }
+    renderLive();
+    await queryLive();
+  })();
+});
+
 // --- status ---
 function showStatus(info: StatusInfo | null): void {
   const box = $('status');
@@ -171,6 +221,7 @@ function isStatusInfo(value: unknown): value is StatusInfo {
 async function queryStatus(): Promise<void> {
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    activeTabId = tab?.id;
     if (tab?.id === undefined) {
       showStatus(null);
       return;
@@ -206,7 +257,11 @@ async function init(): Promise<void> {
   });
   void showShortcut();
   await queryStatus();
-  window.setInterval(() => void queryStatus(), 1000);
+  await queryLive();
+  window.setInterval(() => {
+    void queryStatus();
+    void queryLive();
+  }, 1000);
 }
 
 void init();

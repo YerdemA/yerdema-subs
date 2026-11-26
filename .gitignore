@@ -9,3 +9,4 @@ playwright-report/
 Thumbs.db
 .claude/settings.local.json
 spike/stt/.profile/
+.cache/

@@ -20,10 +20,17 @@ video.
 - Per-video **timing adjustment** (±0.5 s steps) for out-of-sync subtitles.
 - **Sentences split across several cues are translated as a whole**; the Turkish sentence stays
   on screen for all of its parts.
+- **Live translation for content without subtitles** (popup → "Live translation", or
+  **Alt+Shift+L**): captures the tab's audio, transcribes English speech **locally** with
+  Moonshine (WebGPU, CPU fallback), translates each phrase and shows it over the video or as a
+  floating bar. The audio never leaves your computer; only the recognized text is translated.
+  First use downloads the speech model once (~154 MB); later starts take a few seconds.
 
 ## Limitations
 
-- **It needs existing subtitles.** Videos without any subtitle track are not supported (no
+- Live translation lags speech by ~1–1.5 s, works best with clear speech (music/noise lower
+  accuracy) and may not capture DRM-protected players. One tab at a time.
+- **Subtitle mode needs existing subtitles**; for anything else use live translation (no
   speech-to-text).
 - Not supported: Netflix, Prime Video, Disney+, Twitch, live streams, YouTube Shorts, YouTube
   embeds on other sites, players that render captions as plain DOM text (other than YouTube),

@@ -28,7 +28,8 @@ product direction); otherwise choose the simplest option and log it in `DECISION
 - TypeScript strict, no `any` (use `unknown` + narrowing). Small pure functions in `src/shared/`
   so they can be unit-tested.
 - Code, comments, commit messages, README.md: English. `README.tr.md`, `MANUAL_TEST.md`: Turkish.
-- No runtime dependencies. Keep dev dependencies minimal.
+- Runtime dependencies: only `@huggingface/transformers` (live STT, bundled into the offscreen
+  page; approved by the user 2026-11-26). Ask before adding any other. Keep dev deps minimal.
 - npm scripts must work on **Windows 11** (cross-platform; use Node scripts, not `rm`/`cp`).
 - New features come from `ROADMAP.md`.
 

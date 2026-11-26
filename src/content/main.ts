@@ -1,10 +1,12 @@
 // Isolated-world content script entry: picks the adapter by hostname, owns the lifecycle,
 // applies settings live and answers GET_STATUS from the popup.
-import { isSiteDisabled, loadSettings, subscribeSettings } from '../shared/settings';
+import { DEFAULT_SETTINGS, isSiteDisabled, loadSettings, subscribeSettings } from '../shared/settings';
+import { isLiveCaptionMessage } from '../shared/live';
 import { isRuntimeMessage, type Settings, type StatusInfo } from '../shared/types';
 import { Html5Adapter } from './adapters/html5';
 import type { Adapter } from './adapters/types';
 import { YouTubeAdapter } from './adapters/youtube';
+import { LiveCaptionView } from './live-view';
 
 function isYouTubeHost(hostname: string): boolean {
   return hostname === 'www.youtube.com' || hostname === 'youtube.com' || hostname === 'm.youtube.com';
@@ -33,6 +35,13 @@ function isActive(s: Settings): boolean {
 
 let adapter: Adapter | null = null;
 let settings: Settings | null = null;
+/** Live (speech-to-text) captions for this tab; replaces the subtitle adapter while active. */
+let live: LiveCaptionView | null = null;
+
+/** Settings as seen by this page (site-disabled = disabled). */
+function effective(s: Settings): Settings {
+  return isActive(s) ? s : { ...s, enabled: false };
+}
 
 function createAdapter(s: Settings): Adapter | null {
   if (onYouTube) {
@@ -44,7 +53,8 @@ function createAdapter(s: Settings): Adapter | null {
 
 function apply(s: Settings): void {
   settings = s;
-  if (!isActive(s)) {
+  live?.setSettings(effective(s));
+  if (!isActive(s) || live) {
     adapter?.destroy();
     adapter = null;
     return;
@@ -58,6 +68,10 @@ function currentStatus(): StatusInfo {
   if (!settings) return { ...base, status: 'idle' };
   if (!settings.enabled) return { ...base, status: 'disabled' };
   if (isSiteDisabled(settings, siteHost)) return { ...base, status: 'disabled', detail: 'siteDisabled' };
+  if (live) {
+    const current = live.current ?? undefined;
+    return { ...base, status: 'active', source: 'live', ...(current ? { current } : {}) };
+  }
   const status = adapter?.getStatus() ?? { status: 'no-video' as const };
   const current = adapter?.getCurrent() ?? undefined;
   return { ...status, ...base, ...(current ? { current } : {}) };
@@ -68,7 +82,26 @@ function frameHasVideo(): boolean {
   return document.getElementsByTagName('video').length > 0;
 }
 
+function onLiveMessage(message: Parameters<LiveCaptionView['handle']>[0]): void {
+  if (message.type === 'LIVE_END') {
+    live?.destroy();
+    live = null;
+    if (settings) apply(settings);
+    return;
+  }
+  if (!live) {
+    adapter?.destroy();
+    adapter = null;
+    live = new LiveCaptionView(effective(settings ?? DEFAULT_SETTINGS));
+  }
+  live.handle(message);
+}
+
 chrome.runtime.onMessage.addListener((message: unknown, _sender, sendResponse) => {
+  if (isLiveCaptionMessage(message)) {
+    if (isTop) onLiveMessage(message);
+    return false;
+  }
   if (!isRuntimeMessage(message)) return false;
   if (message.type === 'SET_DELAY') {
     adapter?.setDelay(message.delay);

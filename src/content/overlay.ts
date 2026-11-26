@@ -310,6 +310,27 @@ export class Overlay {
     };
   }
 
+  /**
+   * Floating caption bar over the whole viewport (no <video> to attach to, e.g. podcasts or
+   * audio players). Follows the fullscreen element so it stays visible in fullscreen.
+   */
+  mountFloating(doc: Document = document): void {
+    this.unmount();
+    this.host.style.position = 'fixed';
+    this.host.style.inset = '0';
+    for (const k of ['left', 'top', 'width', 'height', 'display'] as const) this.host.style.removeProperty(k);
+    const place = (): void => {
+      const parent: Element = doc.fullscreenElement ?? doc.body ?? doc.documentElement;
+      if (this.host.parentNode !== parent) parent.append(this.host);
+    };
+    place();
+    doc.addEventListener('fullscreenchange', place);
+    this.cleanupMount = () => {
+      doc.removeEventListener('fullscreenchange', place);
+      this.host.remove();
+    };
+  }
+
   unmount(): void {
     this.cleanupMount?.();
     this.cleanupMount = null;
